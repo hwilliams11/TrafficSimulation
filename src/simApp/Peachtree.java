@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
 
 
@@ -20,7 +21,7 @@ import java.util.Scanner;
 public class Peachtree {
 	
 	
-	protected static final int NUM_CARS=20;
+	protected static final int NUM_CARS=1;
 	protected static final double RATE = 1/8.0;
 	private static final int END_TIME = (int) (NUM_CARS*(1/RATE))*3;
 	private static int totalCars;
@@ -127,8 +128,8 @@ public class Peachtree {
 		for( int i=0; i<NUM_CARS; i++ ){
 			currentTime += Exponential.expon(RATE);
 			Vehicle v = Vehicle.randVehicle();
-			//v.setOrigin(PTIntersection.ELEVENTH_WEST);
-			//v.setDestination(PTIntersection.ELEVENTH_WEST);
+			v.setOrigin(PTIntersection.TWELFTH_WEST);
+			v.setDestination(PTIntersection.PEACHTREE_SOUTH);
 			//System.out.println("Current time: "+currentTime);
 			arrivals.add( new SystemArrival( v,currentTime) );
 		}
@@ -271,7 +272,81 @@ public class Peachtree {
 	}
 	public static ArrayList<VehicleISInfo> computeRoute(Vehicle vehicle) {
 		
-		PTIntersection origin = vehicle.getOrigin();
+		Intersection is = Peachtree.findIntersection( vehicle.getOrigin() );
+		VehicleDirection direction = null;
+		
+		Direction entry = Peachtree.vehicleEntry( vehicle );
+	
+		Direction dir;
+
+		dir = Peachtree.northOrSouthOfDest(is, vehicle);
+		
+		if( dir == null )
+			dir = Peachtree.eastOrWestOfDest(is, vehicle);
+		
+		direction = new VehicleDirection(entry,dir.getOppositeDir()); 
+		vehicle.setDirection(direction);
+		Queue<VehicleISInfo> route = vehicle.getRoute();
+		route.add( new VehicleISInfo( is, direction ) );
+		Intersection nextIs = is;
+		
+		while( nextIs != null ){
+			
+			Direction northOrSouth = Peachtree.northOrSouthOfDest(nextIs, vehicle);
+			
+			if( sameLevel( nextIs, vehicle ) ){ 
+				//keep going through and schedule system departure
+				
+				if( vehicle.getDestination().getValue()%10==0 ){//heading west
+					
+					direction = new VehicleDirection( vehicle.getDirection().getFrom(), Direction.WEST );
+					route.add( new VehicleISInfo( nextIs, direction ));
+					nextIs = null;
+				}
+				else if( vehicle.getDestination().getValue()%10==2 ){//heading east
+					direction = new VehicleDirection( vehicle.getDirection().getFrom(), Direction.EAST );
+					route.add( new VehicleISInfo( nextIs, direction ));
+					nextIs = null;
+				}
+				
+				
+			}
+			else if( northOrSouth == Direction.NORTH ){  //go south
+				
+				direction = new VehicleDirection( northOrSouth, Direction.SOUTH);
+				
+				
+				if( nextIs.getId()==PTIntersection.TENTH&&vehicle.getDestination()==PTIntersection.PEACHTREE_SOUTH ){//departing system
+				
+					nextIs = null;
+				}
+				else{
+					nextIs = Peachtree.getNextIntersection( nextIs, Direction.SOUTH );
+					route.add( new VehicleISInfo( nextIs, direction ));
+				}
+			}
+			else if( northOrSouth == Direction.SOUTH ){	//go north
+				
+				direction = new VehicleDirection( northOrSouth, Direction.NORTH );
+				
+				if( nextIs.getId()==PTIntersection.FOURTEENTH&&vehicle.getDestination()==PTIntersection.PEACHTREE_NORTH ){//departing system
+			
+					nextIs = null;
+				}
+				else{
+					nextIs = Peachtree.getNextIntersection( nextIs, Direction.NORTH );
+					route.add( new VehicleISInfo( nextIs, direction ));
+				}
+			}
+		}
+		System.out.println("Vehicle: "+vehicle.getId()+" "+vehicle.getOrigin()+" "+vehicle.getDestination());
+		System.out.println("Route: "+route.size());
+		for( VehicleISInfo vi: route)
+			System.out.println(vi);
+		System.exit(0);
 		return null;
+	}
+	private static boolean sameLevel( Intersection is, Vehicle vehicle) {
+		return is.getId().getValue()/10 == vehicle.getDestination().getValue()/10;
 	}
 }
