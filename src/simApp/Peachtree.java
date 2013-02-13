@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Random;
@@ -29,7 +28,7 @@ public class Peachtree {
 	
 	protected static final int NUM_CARS=20;
 	protected static final double RATE = 1/8.0;
-	private static final int END_TIME = Math.max(300, (int) (NUM_CARS*(1/RATE))*3);
+	private static final int END_TIME = 10000;
 	private static int totalCars;
 	private static double averageCarsInSystem;
 	private static double averageDelay;
@@ -136,6 +135,43 @@ public class Peachtree {
 	public static List<TrafficEvent> createArrivals(){
 		
 		Peachtree.getOriginData();
+		ArrayList<TrafficEvent> arrivals = new ArrayList<TrafficEvent>();
+		double currentTime;
+		
+		for( Integer origin: originDestinationMap.keySet() ){
+			
+			currentTime = 0;
+			int dest;
+			double rate = originRates.get( origin );
+			//System.out.println("ORIGIN: "+origin+" rate: "+rate);
+			while( currentTime < SIM_TIME_SECONDS ){
+				
+				
+				dest = Peachtree.generateRandomDestination( origin );
+				currentTime += Exponential.expon(rate);
+				//System.out.println(" currentTime: "+currentTime);
+				if( currentTime > SIM_TIME_SECONDS ){
+					break;
+				}
+				
+				else{
+					PTIntersection ptiOrigin = PTIntersection.getPTIntersection( origin );
+					PTIntersection ptiDest = PTIntersection.getPTIntersection( dest );
+					Vehicle v = new Vehicle(totalCars++,(int)currentTime,ptiOrigin,ptiDest);
+					arrivals.add( new SystemArrival( v,(int)currentTime) );
+				}
+			}
+		}
+		
+		return arrivals;
+	}
+	/**
+	 * Creates vehicles and a list of SystemArrivals
+	 * @return returns a list of SystemArrival objects
+	 */
+	public static List<TrafficEvent> createArrivalsOld(){
+		
+		
 		ArrayList<TrafficEvent> arrivals = new ArrayList<TrafficEvent>();
 		int currentTime = 0;
 		
@@ -404,8 +440,7 @@ public class Peachtree {
 			int origin = Integer.parseInt( tokens[0] );
 			int totalCars = Integer.parseInt( tokens[1] );
 			originDestinationMap.get(origin).setTotalCars(totalCars);
-			double expectedValue = (double)totalCars/SIM_TIME_SECONDS ;
-			double rate = 1/expectedValue;
+			double rate = (double)totalCars/SIM_TIME_SECONDS ;
 			originRates.put( origin, rate );
 			int mapping = originDestinationMap.get(origin).getMapping();
 			for(int i=0;i<numDestinations;i++){
@@ -493,6 +528,8 @@ public class Peachtree {
 		
 		Peachtree.getOriginData();
 		int dest = Peachtree.generateRandomDestination(61);
+		List<TrafficEvent> arrivals = Peachtree.createArrivals();
+		System.out.println(arrivals.size());
 		//Peachtree.runDistributionTest();
 	}
 }

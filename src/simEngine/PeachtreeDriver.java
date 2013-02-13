@@ -1,12 +1,10 @@
 package simEngine;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import simApp.Event;
 import simApp.EventComparator;
 import simApp.Peachtree;
-import simApp.TrafficEvent;
 
 public class PeachtreeDriver {
 

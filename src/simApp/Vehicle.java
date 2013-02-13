@@ -15,23 +15,16 @@ public class Vehicle {
 	private PTIntersection origin;
 	private PTIntersection destination;
 	private int timeInSystem;
-	private int speed;
-	private int length;
 	private VehicleDirection direction;
 	private static int vehicleIds = 0;
 	private static int vehicleTime = 0;
-	private final static int CAR_SPEED = 20;
-	private final static int CAR_LEN = 8;
 	private Queue<VehicleISInfo> route;
 	
-	public Vehicle(int id, int systemArrivalTime, PTIntersection origin, PTIntersection destination, int speed,
-			int length) {
+	public Vehicle(int id, int systemArrivalTime, PTIntersection origin, PTIntersection destination) {
 		this.id = id;
 		this.systemArrivalTime = systemArrivalTime;
 		this.origin = origin;
 		this.destination = destination;
-		this.speed = speed;
-		this.length = length;
 		route = new MyQueue<VehicleISInfo>();
 	}
 /**
@@ -43,7 +36,7 @@ public class Vehicle {
 	
 		PTIntersection orig = getRandomEntryExit();
 		PTIntersection dest = getRandomEntryExit();
-		return new Vehicle( vehicleIds++,vehicleTime++, orig, dest, CAR_SPEED, CAR_LEN );
+		return new Vehicle( vehicleIds++,vehicleTime++, orig, dest );
 	}
 /**
  * Creates a random entry or exit can come from any entry point into Peachtree
@@ -118,20 +111,6 @@ public class Vehicle {
 	}
 	/**
 	 * 
-	 * @return speed that a car is currently traveling
-	 */
-	public int getSpeed() {
-		return speed;
-	}
-	/**
-	 * 
-	 * @return the length of the vehicle 
-	 */
-	public int getLength() {
-		return length;
-	}
-	/**
-	 * 
 	 * @return direction that vehicle is traveling
 	 */
 	public VehicleDirection getDirection() {
@@ -180,20 +159,6 @@ public class Vehicle {
 		this.timeInSystem = timeInSystem;
 	}
 	/**
-	 * Set the speed of car
-	 * @param speed new speed
-	 */
-	public void setSpeed(int speed) {
-		this.speed = speed;
-	}
-	/**
-	 * Set the length of the car
-	 * @param length new length
-	 */
-	public void setLength(int length) {
-		this.length = length;
-	}
-	/**
 	 * Set the direction that a car is traveling
 	 * @param direction
 	 */
@@ -205,8 +170,7 @@ public class Vehicle {
 		return "Vehicle [id=" + id + ", directionComingFrom="
 				+ direction + ", origin=" + origin + ", destination="
 				+ destination + ", systemArrivalTime=" + systemArrivalTime
-				+ ", sumDelay=" + sumDelay + ", timeInSystem=" + timeInSystem
-				+ ", speed=" + speed + ", length=" + length + "]";
+				+ ", sumDelay=" + sumDelay + ", timeInSystem=" + timeInSystem+ "]";
 	}	
 	
 }

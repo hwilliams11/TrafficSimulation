@@ -26,11 +26,22 @@ public enum PTIntersection {
 	}
 	private static final List<PTIntersection> VALUES =
 		    Collections.unmodifiableList(Arrays.asList(values()));
-		  private static final int SIZE = VALUES.size();
-		  private static final Random RANDOM = new Random();
+	private static final int SIZE = VALUES.size();
+	private static final Random RANDOM = new Random();
 
 	public static PTIntersection randomIntersection()  {
 		    return VALUES.get(RANDOM.nextInt(SIZE));
+	}
+	public static List<PTIntersection> getValues(){
+		return VALUES;
+	}
+	public static PTIntersection getPTIntersection( int val ){
+		
+		for( PTIntersection pi: VALUES ){
+			if( pi.value == val )
+				return pi;
+		}
+		return null;
 	}
 	/**
 	 * 
