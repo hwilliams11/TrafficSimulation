@@ -27,7 +27,7 @@ public class IntersectionDeparture extends TrafficEvent{
 			return new SystemDeparture( is,vehicle,vehicle.getDirection(), time+travelTime);
 		}
 		
-		VehicleISInfo vinfo = Peachtree.nextIntersection(vehicle);
+		VehicleISInfo vinfo = peachtree.nextIntersection(vehicle);
 		Intersection nextIs = vinfo.getIntersection();
 		VehicleDirection direction = vinfo.getDirection();
 		

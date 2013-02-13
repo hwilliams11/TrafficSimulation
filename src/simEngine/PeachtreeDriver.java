@@ -12,8 +12,9 @@ public class PeachtreeDriver {
 	public static void main(String[] args) {
 		
 		Comparator<Event> cmp = new EventComparator(); 
-		Peachtree.setup();
-		List<? extends Event> arrivals = Peachtree.createArrivals();
+		Peachtree pt = Peachtree.getInstance();
+		System.out.println(pt);
+		List<? extends Event> arrivals = pt.createArrivals();
 		EventEngine engine = new EventEngine(cmp,(List<Event>) arrivals);
 		engine.process();
 		System.out.println("Done");

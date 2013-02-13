@@ -25,7 +25,7 @@ public class SystemDeparture extends TrafficEvent {
 		System.out.printf("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-6s %-6s %-15s\n", "SystemDeparture","intersection:",is.getId(),
 				"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),
 				"going:",vehicle.getDirection().getTo()+" on:",vehicle.getDestination());
-		Peachtree.updateStatistics(is,direction,time,vehicle);
+		peachtree.updateStatistics(is,direction,time,vehicle);
 		return null;
 	}
 

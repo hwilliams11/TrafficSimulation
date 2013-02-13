@@ -13,6 +13,7 @@ public abstract class TrafficEvent extends Event{
 	protected EventType type;
 	protected Vehicle vehicle;
 	protected int time;
+	protected Peachtree peachtree;
 	
 	/**
 	 * 
@@ -25,6 +26,7 @@ public abstract class TrafficEvent extends Event{
 		this.vehicle = vehicle;
 		this.time = time;
 		this.type = type;
+		peachtree = Peachtree.getInstance();
 		
 	}
 	public abstract TrafficEvent event();

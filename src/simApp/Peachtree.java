@@ -26,24 +26,24 @@ import java.util.Set;
 public class Peachtree {
 	
 	
-	protected static final int NUM_CARS=20;
-	protected static final double RATE = 1/8.0;
-	private static final int END_TIME = 10000;
-	private static int totalCars;
-	private static double averageCarsInSystem;
-	private static double averageDelay;
-	private static int sumTimeInSystem;
-	private static double averageTimeInSystem;
-	private static int [][] originDestinationData;
-	private static HashMap<Integer, OriginInfo> originDestinationMap;
+	private static Peachtree instance = null;
+	protected  final int NUM_CARS=20;
+	protected  final double RATE = 1/8.0;
+	private  final int END_TIME = 10000;
+	private  int totalCars;
+	private  double averageCarsInSystem;
+	private  double averageDelay;
+	private  int sumTimeInSystem;
+	private  double averageTimeInSystem;
+	private  int [][] originDestinationData;
+	private  HashMap<Integer, OriginInfo> originDestinationMap;
+	private  HashMap<PTIntersection,Intersection> intersections;
+	private  HashMap<Integer, Double> originRates;
+	private  final int SIM_TIME_SECONDS = 7200;
+	private final  String trafficLightTimesFile = "lightTimes.txt";
+	private final  String originDestinationDataFile = "originDestinationDistributionData.csv";
 	
-	private static HashMap<PTIntersection,Intersection> intersections;
-	private static HashMap<Integer, Double> originRates;
-	private static final int SIM_TIME_SECONDS = 7200;
-	private final static String trafficLightTimesFile = "lightTimes.txt";
-	private final static String originDestinationDataFile = "originDestinationDistributionData.csv";
-	
-	public static void setup(){
+	private Peachtree(){
 		
 		totalCars = 0;
 		averageCarsInSystem = 0;
@@ -51,6 +51,9 @@ public class Peachtree {
 		sumTimeInSystem = 0;
 		averageTimeInSystem = 0;
 		
+		
+	}
+	private void setup(){
 		
 		HashMap<PTIntersection,HashMap<VehicleDirection,Integer>> lightTimes = readLightTimes();
 		intersections = new HashMap<PTIntersection,Intersection>();
@@ -60,12 +63,21 @@ public class Peachtree {
 		intersections.put(PTIntersection.TWELFTH, new Intersection(PTIntersection.TWELFTH,lightTimes.get(PTIntersection.TWELFTH)) );
 		intersections.put(PTIntersection.THIRTEENTH, new Intersection(PTIntersection.THIRTEENTH,lightTimes.get(PTIntersection.THIRTEENTH)) );
 		intersections.put(PTIntersection.FOURTEENTH, new Intersection(PTIntersection.FOURTEENTH,lightTimes.get(PTIntersection.FOURTEENTH)) );
+		
+	}
+	public static Peachtree getInstance(){
+		
+		if( instance == null ){
+			instance = new Peachtree();
+			instance.setup();
+		}
+		return instance;
 	}
 	/**
 	 * Reads the light times from a file
 	 * @return map of traffic light times for each intersection in each direction
 	 */
-	private static HashMap<PTIntersection, HashMap<VehicleDirection, Integer>> readLightTimes() {
+	private  HashMap<PTIntersection, HashMap<VehicleDirection, Integer>> readLightTimes() {
 		
 		HashMap<PTIntersection, HashMap<VehicleDirection, Integer>> hm = new HashMap<PTIntersection, HashMap<VehicleDirection, Integer>>();
 		Scanner scan = null;
@@ -132,9 +144,9 @@ public class Peachtree {
 	 * Creates vehicles and a list of SystemArrivals
 	 * @return returns a list of SystemArrival objects
 	 */
-	public static List<TrafficEvent> createArrivals(){
+	public  List<TrafficEvent> createArrivals(){
 		
-		Peachtree.getOriginData();
+		getOriginData();
 		ArrayList<TrafficEvent> arrivals = new ArrayList<TrafficEvent>();
 		double currentTime;
 		
@@ -147,8 +159,9 @@ public class Peachtree {
 			while( currentTime < SIM_TIME_SECONDS ){
 				
 				
-				dest = Peachtree.generateRandomDestination( origin );
+				dest = instance.generateRandomDestination( origin );
 				currentTime += Exponential.expon(rate);
+				
 				//System.out.println(" currentTime: "+currentTime);
 				if( currentTime > SIM_TIME_SECONDS ){
 					break;
@@ -160,6 +173,7 @@ public class Peachtree {
 					Vehicle v = new Vehicle(totalCars++,(int)currentTime,ptiOrigin,ptiDest);
 					arrivals.add( new SystemArrival( v,(int)currentTime) );
 				}
+				
 			}
 		}
 		
@@ -169,7 +183,7 @@ public class Peachtree {
 	 * Creates vehicles and a list of SystemArrivals
 	 * @return returns a list of SystemArrival objects
 	 */
-	public static List<TrafficEvent> createArrivalsOld(){
+	public  List<TrafficEvent> createArrivalsOld(){
 		
 		
 		ArrayList<TrafficEvent> arrivals = new ArrayList<TrafficEvent>();
@@ -192,7 +206,7 @@ public class Peachtree {
  * @param pti intersection
  * @return returns the Intersection object at this intersection
  */
-	public static Intersection getIntersection(PTIntersection pti ){
+	public  Intersection getIntersection(PTIntersection pti ){
 		
 		return intersections.get(pti);
 	}
@@ -201,7 +215,7 @@ public class Peachtree {
 	 * @param origin origin that a car enters at 
 	 * @return the Peachtree intersection
 	 */
-	public static Intersection findIntersection(PTIntersection origin) {
+	public  Intersection findIntersection(PTIntersection origin) {
 		
 		int val = origin.getValue();
 		//System.out.println( origin+" "+origin.getValue());
@@ -229,7 +243,7 @@ public class Peachtree {
 	 * @param time time that car departed
 	 * @param vehicle Vehicle object that left system
 	 */
-	public static void updateStatistics(Intersection is,
+	public  void updateStatistics(Intersection is,
 			VehicleDirection direction, int time, Vehicle vehicle) {
 		
 		sumTimeInSystem += (time-vehicle.getSystemArrivalTime());
@@ -243,7 +257,7 @@ public class Peachtree {
 	 * @param direction direction that a car is headed
 	 * @return next intersection that a car needs to go to
 	 */
-	public static Intersection getNextIntersection(Intersection is,
+	public  Intersection getNextIntersection(Intersection is,
 			Direction direction) {
 	
 		PTIntersection pti = is.getId();
@@ -278,7 +292,7 @@ public class Peachtree {
 	 * @param vehicle vehicle object containing its destination
 	 * @return Direction north or South
 	 */
-	public static Direction northOrSouthOfDest(Intersection is, Vehicle vehicle) {
+	public  Direction northOrSouthOfDest(Intersection is, Vehicle vehicle) {
 		
 		//System.out.println("Intersection: "+is.getId().getValue()+" Destination: "+vehicle.getDestination().getValue());
 		return is.getId().northOrSouthOf(vehicle.getDestination());
@@ -290,7 +304,7 @@ public class Peachtree {
 	 * @param vehicle current vehicle
 	 * @return Direction east or west
 	 */
-	public static Direction eastOrWestOfDest(Intersection is, Vehicle vehicle) {
+	public  Direction eastOrWestOfDest(Intersection is, Vehicle vehicle) {
 		
 		//System.out.println("dir: "+is.getId().eastOrWestOf( vehicle.getDestination()) );
 		return is.getId().eastOrWestOf( vehicle.getDestination() );
@@ -300,7 +314,7 @@ public class Peachtree {
 	 * @param vehicle current vehicle
 	 * @return determines the direction that a a vehicle is headed when it enters the system
 	 */
-	public static Direction vehicleEntry(Vehicle vehicle) {
+	public  Direction vehicleEntry(Vehicle vehicle) {
 		
 		if( vehicle.getOrigin().getValue() %10 == 0 )//from west
 			return Direction.WEST;
@@ -314,25 +328,25 @@ public class Peachtree {
 		System.exit(0);
 		return null;
 	}
-	public static int getNumCars(){
+	public  int getNumCars(){
 		return NUM_CARS;
 	}
-	public static int getEndTime() {
+	public  int getEndTime() {
 		return END_TIME;
 	}
-	public static void computeRoute(Vehicle vehicle) {
+	public  void computeRoute(Vehicle vehicle) {
 		
-		Intersection is = Peachtree.findIntersection( vehicle.getOrigin() );
+		Intersection is = instance.findIntersection( vehicle.getOrigin() );
 		VehicleDirection direction = null;
 		
-		Direction entry = Peachtree.vehicleEntry( vehicle );
+		Direction entry = instance.vehicleEntry( vehicle );
 	
 		Direction dir;
 
-		dir = Peachtree.northOrSouthOfDest(is, vehicle);
+		dir = instance.northOrSouthOfDest(is, vehicle);
 		
 		if( dir == null )
-			dir = Peachtree.eastOrWestOfDest(is, vehicle);
+			dir = instance.eastOrWestOfDest(is, vehicle);
 		
 		direction = new VehicleDirection(entry,dir.getOppositeDir()); 
 		vehicle.setDirection(direction);
@@ -342,7 +356,7 @@ public class Peachtree {
 		
 		while( nextIs != null ){
 			
-			Direction northOrSouth = Peachtree.northOrSouthOfDest(nextIs, vehicle);
+			Direction northOrSouth = instance.northOrSouthOfDest(nextIs, vehicle);
 			
 			if( sameLevel( nextIs, vehicle ) ){ 
 				//keep going through and schedule system departure
@@ -371,7 +385,7 @@ public class Peachtree {
 					nextIs = null;
 				}
 				else{
-					nextIs = Peachtree.getNextIntersection( nextIs, Direction.SOUTH );
+					nextIs = instance.getNextIntersection( nextIs, Direction.SOUTH );
 					route.add( new VehicleISInfo( nextIs, direction ));
 				}
 			}
@@ -384,7 +398,7 @@ public class Peachtree {
 					nextIs = null;
 				}
 				else{
-					nextIs = Peachtree.getNextIntersection( nextIs, Direction.NORTH );
+					nextIs = instance.getNextIntersection( nextIs, Direction.NORTH );
 					route.add( new VehicleISInfo( nextIs, direction ));
 				}
 			}
@@ -398,14 +412,14 @@ public class Peachtree {
 		*/
 		//System.exit(0);
 	}
-	private static boolean sameLevel( Intersection is, Vehicle vehicle) {
+	private  boolean sameLevel( Intersection is, Vehicle vehicle) {
 		return is.getId().getValue()/10 == vehicle.getDestination().getValue()/10;
 	}
-	public static VehicleISInfo nextIntersection(Vehicle vehicle) {
+	public  VehicleISInfo nextIntersection(Vehicle vehicle) {
 		
 		return vehicle.getRoute().remove();
 	}
-	public static void getOriginData(){
+	public  void getOriginData(){
 		
 		Scanner scan = null;
 		String line = null;
@@ -447,6 +461,7 @@ public class Peachtree {
 				originDestinationData[mapping][i]=Integer.parseInt( tokens[i+2] );
 			}
 		}
+		scan.close();
 		//System.out.println(originRates);
 	}
 	public void printOriginDestinationData(){
@@ -466,7 +481,8 @@ public class Peachtree {
 			System.out.println();
 		}
 	}
-	public static int generateRandomDestination( int origin ){
+	public  int generateRandomDestination( int origin ){
+		
 		Random rand = new Random();
 		OriginInfo oinfo = originDestinationMap.get( origin );
 		int mapping = oinfo.getMapping();
@@ -490,7 +506,7 @@ public class Peachtree {
 		}
 		return -1;
 	}
-	public static void runDistributionTest(){
+	public  void runDistributionTest(){
 		
 		ArrayList<Integer> keys = new ArrayList<Integer>();
 		keys.addAll( originDestinationMap.keySet() );
@@ -503,7 +519,7 @@ public class Peachtree {
 		for( int origin: keys ){
 			int originMapping = originDestinationMap.get( origin ).getMapping();
 			for( int i = 0;i<TOTAL_CARS;i++){
-				int dest = Peachtree.generateRandomDestination( origin );
+				int dest = instance.generateRandomDestination( origin );
 				int destMapping = originDestinationMap.get( dest ).getMapping();
 				distr[originMapping][destMapping]+=1;
 			}
@@ -526,10 +542,14 @@ public class Peachtree {
 	}
 	public static void main(String[]args){
 		
-		Peachtree.getOriginData();
-		int dest = Peachtree.generateRandomDestination(61);
-		List<TrafficEvent> arrivals = Peachtree.createArrivals();
-		System.out.println(arrivals.size());
-		//Peachtree.runDistributionTest();
+		Peachtree pt = Peachtree.getInstance();
+		pt = Peachtree.getInstance();
+		pt = Peachtree.getInstance();
+		pt.getOriginData();
+		int dest = pt.generateRandomDestination(61);
+		List<TrafficEvent> arrivals = pt.createArrivals();
+		/*System.out.println(arrivals.size());
+		*/
+		//instance.runDistributionTest();
 	}
 }

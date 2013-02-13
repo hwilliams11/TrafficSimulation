@@ -17,6 +17,7 @@ public class Intersection {
 	private HashMap<VehicleDirection,Double> delays;
 	private double averageDelay;
 	private PTIntersection id;
+	private Peachtree peachtree;
 	
 	/**
 	 * Creates an Intersection object at a particular intersection with traffic light times
@@ -26,6 +27,7 @@ public class Intersection {
 	public Intersection(PTIntersection id, HashMap<VehicleDirection,Integer> lightTimes){
 		this.id = id;
 		
+		peachtree = Peachtree.getInstance();
 		
 		intersectionQs = new HashMap<VehicleDirection,MyQueue<Vehicle>>();
 		
@@ -76,7 +78,7 @@ public class Intersection {
 		
 		averageDelay=0;
 		
-		light = new TrafficLight(Peachtree.getEndTime(),lightTimes);
+		light = new TrafficLight(peachtree.getEndTime(),lightTimes);
 	
 		//setup traffic light times
 		/*

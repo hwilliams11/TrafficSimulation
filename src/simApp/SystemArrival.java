@@ -23,11 +23,11 @@ public class SystemArrival extends TrafficEvent {
 		
 		int travelTime = 5;
 		
-		Peachtree.computeRoute( vehicle );
+		peachtree.computeRoute( vehicle );
 		
 		//int travelTime = vehicle.computeTravelTime( is, nextIs );;//compute based on speed and distance between intersections
 	
-		VehicleISInfo vinfo = Peachtree.nextIntersection( vehicle );
+		VehicleISInfo vinfo = peachtree.nextIntersection( vehicle );
 		Intersection is = vinfo.getIntersection();
 		VehicleDirection direction = vinfo.getDirection();
 		System.out.printf("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s\n", "SystemArrival","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection());

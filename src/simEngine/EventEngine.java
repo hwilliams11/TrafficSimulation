@@ -46,7 +46,6 @@ public class EventEngine{
 				scan.nextLine();
 			
 		}
-		System.out.println("END TIME: "+Peachtree.getEndTime());
 	}
 
 }
