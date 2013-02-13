@@ -5,10 +5,16 @@ import generalAlgos.Exponential;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 
 
@@ -21,16 +27,23 @@ import java.util.Scanner;
 public class Peachtree {
 	
 	
-	protected static final int NUM_CARS=1;
+	protected static final int NUM_CARS=20;
 	protected static final double RATE = 1/8.0;
-	private static final int END_TIME = (int) (NUM_CARS*(1/RATE))*3;
+	private static final int END_TIME = Math.max(300, (int) (NUM_CARS*(1/RATE))*3);
 	private static int totalCars;
 	private static double averageCarsInSystem;
 	private static double averageDelay;
 	private static int sumTimeInSystem;
 	private static double averageTimeInSystem;
+	private static int [][] originDestinationData;
+	private static HashMap<Integer, OriginInfo> originDestinationMap;
+	
 	private static HashMap<PTIntersection,Intersection> intersections;
+	private static HashMap<Integer, Double> originRates;
+	private static final int SIM_TIME_SECONDS = 7200;
 	private final static String trafficLightTimesFile = "lightTimes.txt";
+	private final static String originDestinationDataFile = "originDestinationDistributionData.csv";
+	
 	public static void setup(){
 		
 		totalCars = 0;
@@ -38,6 +51,7 @@ public class Peachtree {
 		averageDelay = 0;
 		sumTimeInSystem = 0;
 		averageTimeInSystem = 0;
+		
 		
 		HashMap<PTIntersection,HashMap<VehicleDirection,Integer>> lightTimes = readLightTimes();
 		intersections = new HashMap<PTIntersection,Intersection>();
@@ -121,15 +135,15 @@ public class Peachtree {
 	 */
 	public static List<TrafficEvent> createArrivals(){
 		
-		
+		Peachtree.getOriginData();
 		ArrayList<TrafficEvent> arrivals = new ArrayList<TrafficEvent>();
 		int currentTime = 0;
 		
 		for( int i=0; i<NUM_CARS; i++ ){
 			currentTime += Exponential.expon(RATE);
 			Vehicle v = Vehicle.randVehicle();
-			v.setOrigin(PTIntersection.TWELFTH_WEST);
-			v.setDestination(PTIntersection.PEACHTREE_SOUTH);
+			v.setOrigin(PTIntersection.PEACHTREE_SOUTH);
+			v.setDestination(PTIntersection.FOURTEENTH_WEST);
 			//System.out.println("Current time: "+currentTime);
 			arrivals.add( new SystemArrival( v,currentTime) );
 		}
@@ -270,7 +284,7 @@ public class Peachtree {
 	public static int getEndTime() {
 		return END_TIME;
 	}
-	public static ArrayList<VehicleISInfo> computeRoute(Vehicle vehicle) {
+	public static void computeRoute(Vehicle vehicle) {
 		
 		Intersection is = Peachtree.findIntersection( vehicle.getOrigin() );
 		VehicleDirection direction = null;
@@ -339,14 +353,146 @@ public class Peachtree {
 				}
 			}
 		}
+		/*
 		System.out.println("Vehicle: "+vehicle.getId()+" "+vehicle.getOrigin()+" "+vehicle.getDestination());
 		System.out.println("Route: "+route.size());
 		for( VehicleISInfo vi: route)
 			System.out.println(vi);
-		System.exit(0);
-		return null;
+		System.out.println("TIME: "+END_TIME);
+		*/
+		//System.exit(0);
 	}
 	private static boolean sameLevel( Intersection is, Vehicle vehicle) {
 		return is.getId().getValue()/10 == vehicle.getDestination().getValue()/10;
+	}
+	public static VehicleISInfo nextIntersection(Vehicle vehicle) {
+		
+		return vehicle.getRoute().remove();
+	}
+	public static void getOriginData(){
+		
+		Scanner scan = null;
+		String line = null;
+		String []tokens;
+		
+		originDestinationMap = new HashMap<Integer,OriginInfo>();
+		originRates = new HashMap<Integer,Double>();
+		
+		try {
+			scan = new Scanner( new File( originDestinationDataFile) );
+		} catch (FileNotFoundException e) { e.printStackTrace(); }
+		
+		if( scan.hasNext() )
+			line = scan.nextLine();
+		tokens = line.split(",");
+		
+		
+		int numDestinations = tokens.length-2;
+		originDestinationData = new int[numDestinations][numDestinations];
+		
+		for( int i=2;i<tokens.length;i++){
+			
+			//System.out.println(tokens[i]);
+			originDestinationMap.put(Integer.parseInt(tokens[i]),new OriginInfo((i-2),-1));
+		}
+		
+		
+		while ( scan.hasNext() ){
+			line = scan.nextLine();
+			//System.out.println(line);
+			tokens = line.split(",");
+			int origin = Integer.parseInt( tokens[0] );
+			int totalCars = Integer.parseInt( tokens[1] );
+			originDestinationMap.get(origin).setTotalCars(totalCars);
+			double expectedValue = (double)totalCars/SIM_TIME_SECONDS ;
+			double rate = 1/expectedValue;
+			originRates.put( origin, rate );
+			int mapping = originDestinationMap.get(origin).getMapping();
+			for(int i=0;i<numDestinations;i++){
+				originDestinationData[mapping][i]=Integer.parseInt( tokens[i+2] );
+			}
+		}
+		//System.out.println(originRates);
+	}
+	public void printOriginDestinationData(){
+		Set<Integer> keySet  = originDestinationMap.keySet();
+		ArrayList<Integer> keys = new ArrayList<Integer>();
+		keys.addAll(keySet);
+		Collections.sort(keys);
+		
+		for(Integer key: keys ){
+			OriginInfo oinfo = originDestinationMap.get(key);
+			int mapping = oinfo.getMapping();
+			int totalCars = oinfo.getTotalCars();
+			System.out.printf("%4d %4d ",key,totalCars );
+			for(int j=0;j<originDestinationData[mapping].length;j++){
+				System.out.printf("%4d ",originDestinationData[mapping][j]);
+			}
+			System.out.println();
+		}
+	}
+	public static int generateRandomDestination( int origin ){
+		Random rand = new Random();
+		OriginInfo oinfo = originDestinationMap.get( origin );
+		int mapping = oinfo.getMapping();
+		int totalCars = oinfo.getTotalCars();
+		
+		int randomNum = rand.nextInt( totalCars );
+		int sum = 0;
+		Set<Entry<Integer,OriginInfo>> entrySet = new HashSet<Entry<Integer,OriginInfo>>();
+		entrySet.addAll(originDestinationMap.entrySet() );
+		
+		for( int i = 0;i< originDestinationData[mapping].length;i++){
+		
+			sum+=originDestinationData[mapping][i];
+			if( randomNum < sum ){
+				for( Entry<Integer, OriginInfo> entry: entrySet ){
+					if( entry.getValue().getMapping() == i ){
+						return entry.getKey();
+					}
+				}
+			}
+		}
+		return -1;
+	}
+	public static void runDistributionTest(){
+		
+		ArrayList<Integer> keys = new ArrayList<Integer>();
+		keys.addAll( originDestinationMap.keySet() );
+		Collections.sort( keys );
+		int n = keys.size();
+		final int TOTAL_CARS = 100;
+		double [][] distr = new double[n][n];
+		
+		
+		for( int origin: keys ){
+			int originMapping = originDestinationMap.get( origin ).getMapping();
+			for( int i = 0;i<TOTAL_CARS;i++){
+				int dest = Peachtree.generateRandomDestination( origin );
+				int destMapping = originDestinationMap.get( dest ).getMapping();
+				distr[originMapping][destMapping]+=1;
+			}
+		}
+		
+		System.out.printf("%4s\t", "");
+		for( int dest: keys ){
+			System.out.printf("%4d\t", dest);
+		}
+		System.out.println();
+		for( int origin: keys ){
+			
+			int mapping = originDestinationMap.get(origin).getMapping();
+			System.out.printf("%4d\t", origin);
+			for( int i=0;i<distr[mapping].length;i++){
+				System.out.printf("%-3.2f\t", (double)distr[mapping][i]/TOTAL_CARS);
+			}
+			System.out.println();
+		}
+	}
+	public static void main(String[]args){
+		
+		Peachtree.getOriginData();
+		int dest = Peachtree.generateRandomDestination(61);
+		//Peachtree.runDistributionTest();
 	}
 }

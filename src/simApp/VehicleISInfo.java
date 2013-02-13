@@ -10,6 +10,14 @@ public class VehicleISInfo {
 		this.direction = direction;
 	}
 
+	public Intersection getIntersection() {
+		return intersection;
+	}
+
+	public VehicleDirection getDirection() {
+		return direction;
+	}
+
 	@Override
 	public String toString() {
 		return "VehicleISInfo [intersection=" + intersection.getId() + ", direction="
