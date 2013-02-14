@@ -30,6 +30,15 @@ public abstract class TrafficEvent extends Event{
 		
 	}
 	public abstract TrafficEvent event();
+	public EventType getType() {
+		return type;
+	}
+	public Vehicle getVehicle() {
+		return vehicle;
+	}
+	public int getTime() {
+		return time;
+	}
 	
 
 }

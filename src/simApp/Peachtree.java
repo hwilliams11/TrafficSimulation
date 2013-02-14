@@ -540,16 +540,18 @@ public class Peachtree {
 			System.out.println();
 		}
 	}
+	
+	public int getSIM_TIME_SECONDS() {
+		return SIM_TIME_SECONDS;
+	}
 	public static void main(String[]args){
 		
 		Peachtree pt = Peachtree.getInstance();
-		pt = Peachtree.getInstance();
-		pt = Peachtree.getInstance();
 		pt.getOriginData();
 		int dest = pt.generateRandomDestination(61);
 		List<TrafficEvent> arrivals = pt.createArrivals();
-		/*System.out.println(arrivals.size());
-		*/
-		//instance.runDistributionTest();
+		//pt.printOriginDestinationData();
+		System.out.println(arrivals.size());
+		pt.runDistributionTest();
 	}
 }

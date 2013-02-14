@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import simApp.Event;
 import simApp.Peachtree;
+import simApp.SimulationDone;
 import simApp.SystemArrival;
 
 /**
@@ -19,12 +20,19 @@ import simApp.SystemArrival;
 public class EventEngine{
 
 	PriorityQueue<Event> futureEventList;
+	SimulationDone test;
 	
 	public EventEngine(Comparator<Event> cmp, List<Event> list){
 
 		futureEventList = new PriorityQueue<Event>(cmp);
 		futureEventList.buildHeap(list);
+		test = null;
 	}		
+	public EventEngine(Comparator<Event> cmp, List<Event> arrivals,SimulationDone test) {
+		
+		this( cmp,arrivals );
+		this.test = test;
+	}
 	public void process(){
 		
 		
@@ -34,10 +42,12 @@ public class EventEngine{
 		if( pressEnter )
 			scan = new Scanner(System.in);
 		
-		while( !futureEventList.isEmpty() ){
+		while( !futureEventList.isEmpty()  ){
 			
-			
+
 			Event event = futureEventList.extractMin();
+			if( test!= null && test.done(event))
+				break;
 			Event next = event.event();
 			
 			if( next!= null )
