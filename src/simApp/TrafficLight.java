@@ -3,7 +3,9 @@ package simApp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
+import generalAlgos.RandomGenerator;
 
 /**
  * Traffic Light class provides traffic light functionality for the program. It alters between different queues 
@@ -14,16 +16,12 @@ import java.util.HashMap;
 public class TrafficLight {
 	
 ArrayList<TrafficTime> lightTimes;
+PTIntersection id;
 
-public ArrayList<TrafficTime> getLightTimes() {
-	return lightTimes;
-}
-public void setLightTimes(ArrayList<TrafficTime> lightTimes) {
-	this.lightTimes = lightTimes;
-}
-public TrafficLight(int endTime,HashMap<VehicleDirection,Integer> dirTimes){
+public TrafficLight(int endTime,HashMap<VehicleDirection,TrafficLightTimings> dirTimes, PTIntersection id){
 
 	lightTimes = createTimes(endTime,dirTimes);
+	this.id = id;
 	//System.out.println(this);
 }
 /**
@@ -36,13 +34,18 @@ public TrafficLight(int endTime,HashMap<VehicleDirection,Integer> dirTimes){
  */
 public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 	
-	
-		Peachtree pt = Peachtree.getInstance();
-		if( pt.getIntersection(PTIntersection.THIRTEENTH).getLight() == this ){
+		int maxPedestrianDelay = 5;
+		int perceptiontime = 4;
+		if( vehicleDirection.rightTurn() ){
 			
-		}
-		if( vehicleDirection.rightTurn() )
+			/* Check for pedestrians */
+			if(Pedestrians()){
+				System.out.println("Pedestrians Crossing !!!!! Right turn delayed!");
+				RandomGenerator r = new RandomGenerator();
+				return (int)(maxPedestrianDelay*r.xorrandDouble());
+			}
 			return 0;
+		}
 		int ind = Collections.binarySearch(lightTimes, new TrafficTime(myTime,null));
 		//System.out.println("ind: "+ind);
 		if( ind < 0 ){
@@ -50,50 +53,68 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 			if( ind > 0 )
 				ind--;
 		}
+		//System.out.println("previous time: "+lightTimes.get(ind));
 		//System.out.println("ind: "+ind);
 		TrafficTime t = lightTimes.get(ind);
 		if( canGo(t,vehicleDirection) ){
 			//System.out.println("At time: "+myTime+" Go!!!");
-			return 0;
+			
+			if(vehicleDirection.leftTurn()){
+				
+				/* Check for Pedestrians */
+				if(Pedestrians()){
+					System.out.println("Pedestrians Crossing !!!!!");
+					RandomGenerator r = new RandomGenerator();
+					return (int)(maxPedestrianDelay*r.xorrandDouble());
+				}
+			
+				/**
+				 * Intersections 11 and 12 have no dedicated left turn lights
+				 * In those cases, we choose a random number of cars which can pass through from
+				 * the other side before the vehicle can make a left turn
+				 */
+				if(this.id == PTIntersection.ELEVENTH || this.id == PTIntersection.TWELFTH){
+					
+					System.out.println("Left turns on 11th or 12th street. Wait for some cars to pass!");
+					Peachtree pt = Peachtree.getInstance();
+					int qsize = pt.getIntersection(id).getQueueSize(vehicleDirection);
+					RandomGenerator r = new RandomGenerator();
+					int numcarspassed = (int)(qsize*r.xorrandDouble());
+					
+					Iterator<Vehicle> itr = pt.getIntersection(id).getQueue(vehicleDirection).iterator();
+					int index = 0;
+					while(index < numcarspassed && itr.hasNext()){
+						index = index+1;
+					}
+					Vehicle v = itr.next();
+					double delay;
+					if( v.getDelays().size()>0 ){
+						delay = v.getDelays().getLast();
+					}
+					else{
+						delay = 0;
+					}
+					int crossingdelay = (int)delay;
+					
+					int pdelay = 0;
+					if(Pedestrians()){
+						System.out.println("Pedestrians Crossing !!!!!");
+						pdelay = (int)(maxPedestrianDelay*r.xorrandDouble());
+					}
+					
+					// Add function to propagate delay here
+					return pdelay+crossingdelay;
+				}
+			}
+			return perceptiontime;
 		}
 		else{
 			int nextTime = findNextGo( myTime,ind,vehicleDirection );
-			//System.out.println("At time: "+myTime+" Gotta wait "+vehicleDirection+" delay="+(nextTime-myTime));
+			System.out.println("At time: "+myTime+" Gotta wait "+vehicleDirection+" delay="+(nextTime-myTime));
 			return nextTime - myTime;
 		}
 		
 	}
-public int getDelay(int myTime, VehicleDirection vehicleDirection, Vehicle v) {
-	
-	
-	if( vehicleDirection.rightTurn() )
-		return 0;
-	int ind = Collections.binarySearch(lightTimes, new TrafficTime(myTime,null));
-	//System.out.println("ind: "+ind);
-	if( ind < 0 ){
-		ind = -1*ind-1;
-		if( ind > 0 )
-			ind--;
-	}
-	//System.out.println("ind: "+ind);
-	TrafficTime t = lightTimes.get(ind);
-	if( canGo(t,vehicleDirection) ){
-		//System.out.println("At time: "+myTime+" Go!!!");
-		return 0;
-	}
-	else{
-		int nextTime = findNextGo( myTime,ind,vehicleDirection, v );
-		//System.out.println("At time: "+myTime+" Gotta wait "+vehicleDirection+" delay="+(nextTime-myTime));
-		return nextTime - myTime;
-	}
-	
-}
-private int findNextGo(int myTime, int ind, VehicleDirection vehicleDirection,
-		Vehicle v) {
-	
-	
-	return 0;
-}
 /**
  * Determines the next timestamp that this vehicle will be able to move in its queue
  * @param myTime - vehicle time
@@ -152,10 +173,10 @@ private int findNextGo(int myTime, int ind, VehicleDirection vehicleDirection,
 	 * @param dirTimes contains (direction,time) pairs of the traffic light times
 	 * @return list of trafficTime objects
 	 */
-	public static ArrayList<TrafficTime> createTimes(int endTime,HashMap<VehicleDirection, Integer> dirTimes){
+	public static ArrayList<TrafficTime> createTimes(int endTime,HashMap<VehicleDirection, TrafficLightTimings> dirTimes){
 		
 		int currTime = 0;
-		
+		//System.out.println("createTimes initialized");
 		
 		ArrayList<TrafficTime> traffTimes = new ArrayList<TrafficTime>();
 		int ind = 0;
@@ -169,9 +190,13 @@ private int findNextGo(int myTime, int ind, VehicleDirection vehicleDirection,
 			traffTimes.add( new TrafficTime( currTime,direction));
 			if( ++ind == dirTimes.size())
 				ind = 0;
-			currTime += dirTimes.get(direction);
-			
+			currTime += (dirTimes.get(direction).greentime+dirTimes.get(direction).yellowtime);
+			//System.out.println(currTime);
 		}
+//		for(TrafficTime t:traffTimes)
+//		{
+//			System.out.println(t);
+//		}
 		return traffTimes;
 	}
 	public String toString(){
@@ -179,5 +204,18 @@ private int findNextGo(int myTime, int ind, VehicleDirection vehicleDirection,
 		for( TrafficTime t: lightTimes )
 			s+=t.toString()+"\n";
 		return s;
+	}
+	
+	/* Function to check if there are any pedestrians crossing or not */
+	public boolean Pedestrians(){
+		
+		RandomGenerator rand = new RandomGenerator();
+		double a = rand.xorrandDouble();
+		Peachtree pt = Peachtree.getInstance();
+		double prob = pt.getIntersection(id).getPedestrianProb();
+		if(a < prob)
+			return true;
+		else
+			return false;
 	}
 }

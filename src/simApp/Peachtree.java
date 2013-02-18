@@ -1,14 +1,15 @@
 package simApp;
 
 import generalAlgos.Exponential;
+import generalAlgos.RandomGenerator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -27,21 +28,11 @@ import java.util.Set;
 public class Peachtree {
 	
 	
-	
 	private static Peachtree instance = null;
-	private static boolean writeToFile = false;
-	private TrafficStatistics stats;
-	private PeachtreeSimOutput simOutput;
-	private String outputFilename = "TrafficSimulationOutput.txt";
-	protected  final int NUM_CARS=20;
+	protected  final int NUM_CARS=1;
 	protected  final double RATE = 1/8.0;
-	private final double AGGRESSIVENESS_PROB = .08;
 	private  final int END_TIME = 10000;
 	private  int totalCars;
-	private  double averageCarsInSystem;
-	private  double averageDelay;
-	private  int sumTimeInSystem;
-	private  double averageTimeInSystem;
 	private  int [][] originDestinationData;
 	private  HashMap<Integer, OriginInfo> originDestinationMap;
 	private  HashMap<PTIntersection,Intersection> intersections;
@@ -49,30 +40,20 @@ public class Peachtree {
 	private  final int SIM_TIME_SECONDS = 7200;
 	private final  String trafficLightTimesFile = "lightTimes.txt";
 	private final  String originDestinationDataFile = "originDestinationDistributionData.csv";
+	private final double AGGRESSIVE_PROB = .08;
+	private TrafficStatistics stats;
+	private PeachtreeSimOutput output;
 	
 	private Peachtree(){
 		
 		totalCars = 0;
-		averageCarsInSystem = 0;
-		averageDelay = 0;
-		sumTimeInSystem = 0;
-		averageTimeInSystem = 0;
 		stats = new TrafficStatistics();
-		if( writeToFile ){
-			PrintStream stream = null;
-			try {
-				stream = new PrintStream( new File( outputFilename ));
-			} catch (FileNotFoundException e) {	e.printStackTrace();}
-			simOutput = new PeachtreeSimOutput( stream ); 
-		}
-		else{
-			simOutput = new PeachtreeSimOutput( System.out );
-		}
+		output = new PeachtreeSimOutput( System.out );
 		
 	}
 	private void setup(){
 		
-		HashMap<PTIntersection,HashMap<VehicleDirection,Integer>> lightTimes = readLightTimes();
+		HashMap<PTIntersection,HashMap<VehicleDirection,TrafficLightTimings>> lightTimes = readLightTimes();
 		intersections = new HashMap<PTIntersection,Intersection>();
 		
 		intersections.put(PTIntersection.TENTH, new Intersection(PTIntersection.TENTH,lightTimes.get(PTIntersection.TENTH)) );
@@ -85,7 +66,6 @@ public class Peachtree {
 	public static void reset() {
 		
 		instance = null;
-		
 	}
 	public static Peachtree getInstance(){
 		
@@ -99,67 +79,88 @@ public class Peachtree {
 	 * Reads the light times from a file
 	 * @return map of traffic light times for each intersection in each direction
 	 */
-	private  HashMap<PTIntersection, HashMap<VehicleDirection, Integer>> readLightTimes() {
+	private  HashMap<PTIntersection, HashMap<VehicleDirection, TrafficLightTimings>> readLightTimes() {
 		
-		HashMap<PTIntersection, HashMap<VehicleDirection, Integer>> hm = new HashMap<PTIntersection, HashMap<VehicleDirection, Integer>>();
+		HashMap<PTIntersection, HashMap<VehicleDirection, TrafficLightTimings>> hm = new HashMap<PTIntersection, HashMap<VehicleDirection, TrafficLightTimings>>();
 		Scanner scan = null;
 		try {
 			scan = new Scanner( new File( trafficLightTimesFile));
 		} catch (FileNotFoundException e) {e.printStackTrace();}
 		
 		int street = 0;
+		HashMap<VehicleDirection,TrafficLightTimings> h = new HashMap<VehicleDirection,TrafficLightTimings>(); 
 		if( scan.hasNext() )
 			scan.nextLine();
-		while( scan.hasNext() ){
-			HashMap<VehicleDirection,Integer> h = new HashMap<VehicleDirection,Integer>(); 
+		while(scan.hasNext())
+		{
+			int linenumbr = 1;
 			
-			//h.put( new VehicleDirection( Direction.EAST,Direction.NORTH), 0);
-			//h.put( new VehicleDirection( Direction.WEST,Direction.SOUTH), 0);
 			
-			String line = scan.nextLine();
-			String [] toks = line.split(",");
-			int n = toks.length;
-			for(int i=1;i<n;i++){
-				int time = Integer.parseInt(toks[i]);
-				switch( i ){
+			while( linenumbr != 4 ){
+			
+				//h.put( new VehicleDirection( Direction.EAST,Direction.NORTH), 0);
+				//h.put( new VehicleDirection( Direction.WEST,Direction.SOUTH), 0);
+			
+				String line = scan.nextLine();
+				String [] toks = line.split(",");
+				int n = toks.length;
+				//System.out.println("n="+n);
+				double times = 0.0;
+				int time[] = new int [n];
+				for(int i=1;i<n;i++){
+					times = Double.parseDouble(toks[i]);
+					time[i] = (int) times;
+				}
+				switch( linenumbr ){
 					case 1:{
-						h.put(new VehicleDirection( Direction.NORTH,Direction.SOUTH),time);
+						h.put(new VehicleDirection(Direction.WEST,Direction.NORTH),new TrafficLightTimings(time[0],time[1],time[2]));
+						h.put(new VehicleDirection(Direction.WEST,Direction.EAST), new TrafficLightTimings(time[3],time[4],time[5]));
 						//h.put(new VehicleDirection( Direction.SOUTH,Direction.NORTH),time);
 						break;
 						}
 					case 2:{
-						h.put(new VehicleDirection( Direction.EAST,Direction.WEST),time);
+						h.put(new VehicleDirection(Direction.EAST,Direction.SOUTH),new TrafficLightTimings(time[0],time[1],time[2]));
+						h.put(new VehicleDirection(Direction.EAST,Direction.WEST), new TrafficLightTimings(time[3],time[4],time[5]));
 						//h.put(new VehicleDirection( Direction.WEST,Direction.EAST),time);
 						break;
 						}
 					case 3:{
-						h.put(new VehicleDirection( Direction.NORTH,Direction.EAST),time);
+						h.put(new VehicleDirection(Direction.SOUTH,Direction.WEST),new TrafficLightTimings(time[0],time[1],time[2]));
+						h.put(new VehicleDirection(Direction.SOUTH,Direction.NORTH), new TrafficLightTimings(time[3],time[4],time[5]));
 						//h.put(new VehicleDirection( Direction.SOUTH,Direction.WEST),time);
 						break;
 						}
 					case 4:{
-						h.put(new VehicleDirection( Direction.WEST,Direction.NORTH),time);
-						//h.put(new VehicleDirection( Direction.EAST,Direction.SOUTH),time);
+						h.put(new VehicleDirection(Direction.NORTH,Direction.EAST),new TrafficLightTimings(time[0],time[1],time[2]));
+						h.put(new VehicleDirection(Direction.NORTH,Direction.SOUTH), new TrafficLightTimings(time[3],time[4],time[5]));
 						break;
 					}
 					default:
 				}
-				
+				linenumbr++;
 			}
 			PTIntersection intersection = null;
 			
 			switch( street ){
-				case 0:{ intersection = PTIntersection.TENTH;break; }
-				case 1:{ intersection = PTIntersection.ELEVENTH;break;}
-				case 2:{ intersection = PTIntersection.TWELFTH;break;}
-				case 3:{ intersection = PTIntersection.THIRTEENTH;break;}
-				case 4:{ intersection = PTIntersection.FOURTEENTH;break;}
-				default:{System.err.println("Too many streets");System.exit(0);}
+			case 0:{ intersection = PTIntersection.TENTH;break; }
+			case 1:{ intersection = PTIntersection.ELEVENTH;break;}
+			case 2:{ intersection = PTIntersection.TWELFTH;break;}
+			case 3:{ intersection = PTIntersection.THIRTEENTH;break;}
+			case 4:{ intersection = PTIntersection.FOURTEENTH;break;}
+			default:{System.err.println("Too many streets");System.exit(0);}
 			}
-			
 			hm.put(intersection, h);
 			street++;
+			
+			if(scan.hasNext())
+				scan.nextLine();
+			if(scan.hasNext())
+				scan.nextLine();
+			if(scan.hasNext())
+				scan.nextLine();
 		}
+		
+		scan.close();
 		return hm;
 	}
 	/**
@@ -169,7 +170,7 @@ public class Peachtree {
 	public  List<TrafficEvent> createArrivals(){
 		
 		getOriginData();
-		ArrayList<TrafficEvent> arrivals = new ArrayList<TrafficEvent>();
+		LinkedList<TrafficEvent> arrivals = new LinkedList<TrafficEvent>();
 		double currentTime;
 		
 		for( Integer origin: originDestinationMap.keySet() ){
@@ -192,11 +193,10 @@ public class Peachtree {
 				else{
 					PTIntersection ptiOrigin = PTIntersection.getPTIntersection( origin );
 					PTIntersection ptiDest = PTIntersection.getPTIntersection( dest );
-					
-					
 					Vehicle v = new Vehicle(totalCars++,(int)currentTime,ptiOrigin,ptiDest);
-					if( Math.random()<AGGRESSIVENESS_PROB )
+					if( (new RandomGenerator()).xorrandDouble()<AGGRESSIVE_PROB ){
 						v.setAggressive( true );
+					}
 					arrivals.add( new SystemArrival( v,(int)currentTime) );
 				}
 				
@@ -272,9 +272,7 @@ public class Peachtree {
 	public  void updateStatistics(Intersection is,
 			VehicleDirection direction, int time, Vehicle vehicle) {
 		
-		stats.updateVehicleStats( vehicle, is, direction, time );
-		sumTimeInSystem += (time-vehicle.getSystemArrivalTime());
-		
+		stats.updateVehicleStats(vehicle, is, direction, time);
 		
 	}
 	/**
@@ -488,12 +486,8 @@ public class Peachtree {
 				originDestinationData[mapping][i]=Integer.parseInt( tokens[i+2] );
 			}
 		}
-	
 		scan.close();
-		/*
-		 * System.out.println("Rates");
-		 * System.out.println(originRates);
-		 */
+		//System.out.println(originRates);
 	}
 	public void printOriginDestinationData(){
 		Set<Integer> keySet  = originDestinationMap.keySet();
@@ -571,33 +565,32 @@ public class Peachtree {
 			System.out.println();
 		}
 	}
-	
-	public int getSIM_TIME_SECONDS() {
-		return SIM_TIME_SECONDS;
-	}
-	public TrafficStatistics getStats() {
-		return stats;
-	}
 	public static void main(String[]args){
 		
 		Peachtree pt = Peachtree.getInstance();
+		pt = Peachtree.getInstance();
+		pt = Peachtree.getInstance();
 		pt.getOriginData();
 		int dest = pt.generateRandomDestination(61);
-		//List<TrafficEvent> arrivals = pt.createArrivals();
-		pt.printOriginDestinationData();
-		//System.out.println(arrivals.size());
-		pt.runDistributionTest();
-	}
-	public Object getOutput() {
-		// TODO Auto-generated method stub
-		return null;
+		List<TrafficEvent> arrivals = pt.createArrivals();
+		/*System.out.println(arrivals.size());
+		*/
+		//instance.runDistributionTest();
 	}
 	public PeachtreeSimOutput getSimOutput() {
-		return simOutput;
+		
+		return output;
+	}
+	public int getSIM_TIME_SECONDS() {
+		// TODO Auto-generated method stub
+		return SIM_TIME_SECONDS;
 	}
 	public static void setWriteToFile() {
+		// TODO Auto-generated method stub
 		
-		writeToFile  = true;
-		
+	}
+	public TrafficStatistics getStats() {
+		// TODO Auto-generated method stub
+		return stats;
 	}
 }

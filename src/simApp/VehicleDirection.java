@@ -129,5 +129,17 @@ public boolean sameDir(VehicleDirection dir) {
 	
 	return ((from==dir.from) && (to==dir.to));
 }
+public boolean leftTurn() {
+	
+	if( from == Direction.EAST && to == Direction.SOUTH )
+		return true;
+	if( from == Direction.WEST && to == Direction.NORTH )
+		return true;
+	if( from == Direction.SOUTH && to == Direction.WEST )
+		return true;
+	if( from == Direction.NORTH && to == Direction.EAST )
+		return true;
+	return false;
+}
 
 }

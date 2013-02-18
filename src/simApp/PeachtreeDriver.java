@@ -8,7 +8,7 @@ import simEngine.EventEngine;
 
 public class PeachtreeDriver {
 
-	private final static int NUM_RUNS = 10;
+	private final static int NUM_RUNS = 2;
 	private final static int MEAN = 0;
 	private final static int HALF_WIDTH = 1;
 	
@@ -73,8 +73,9 @@ public class PeachtreeDriver {
 		double [] maxCI = getConfidenceInterval(maxTemp);
 		double [] avgCI = getConfidenceInterval(avgTemp);
 		DecimalFormat fmt = new DecimalFormat("#.000");
-		System.out.println("Max time in system: "+fmt.format(maxCI[0])+" +/- "+fmt.format(maxCI[1]));
-		System.out.println("Avg time in system: "+fmt.format(avgCI[0])+" +/- "+fmt.format(avgCI[1]));
+		System.out.println("Max time in system sample max = "+fmt.format(maxCI[0])+" CI: "+fmt.format(maxCI[0] - maxCI[1])+" <= mu <=  "+fmt.format(maxCI[0]+maxCI[1]));
+		System.out.println("Avg time in system sample avg = "+fmt.format(avgCI[0])+" CI: "+fmt.format(avgCI[0] - avgCI[1])+" <= mu <=  "+fmt.format(avgCI[0]+avgCI[1]));
+		
 	
 		
 	}

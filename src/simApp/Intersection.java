@@ -14,17 +14,17 @@ public class Intersection {
 	private HashMap<VehicleDirection, QueueInfo> intersectionQs;
 	//private HashMap<VehicleDirection,Integer> lightTimes;
 	private TrafficLight light;
-	private HashMap<VehicleDirection,Double> delays;
 	private double averageDelay;
 	private PTIntersection id;
 	private Peachtree peachtree;
+	private double PedestrianProb;
 	
 	/**
 	 * Creates an Intersection object at a particular intersection with traffic light times
 	 * @param id id of intersection (10th,11th...)
 	 * @param lightTimes traffic light times at this intersection
 	 */
-	public Intersection(PTIntersection id, HashMap<VehicleDirection,Integer> lightTimes){
+	public Intersection(PTIntersection id, HashMap<VehicleDirection,TrafficLightTimings> lightTimes){
 		this.id = id;
 		
 		peachtree = Peachtree.getInstance();
@@ -53,66 +53,23 @@ public class Intersection {
 		intersectionQs.put(VehicleDirection.WS, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		intersectionQs.put(VehicleDirection.WW, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		
-		//intitialize delays 
-		delays = new HashMap<VehicleDirection,Double>();
-		
-		delays.put(new VehicleDirection(Direction.NORTH,Direction.NORTH), 0.0);
-		delays.put(new VehicleDirection(Direction.NORTH,Direction.EAST), 0.0);
-		delays.put(new VehicleDirection(Direction.NORTH,Direction.SOUTH), 0.0);
-		delays.put(new VehicleDirection(Direction.NORTH,Direction.WEST), 0.0);
-		
-		delays.put(new VehicleDirection(Direction.EAST, Direction.NORTH), 0.0);
-		delays.put(new VehicleDirection(Direction.EAST, Direction.EAST), 0.0);
-		delays.put(new VehicleDirection(Direction.EAST, Direction.SOUTH), 0.0);
-		delays.put(new VehicleDirection(Direction.EAST, Direction.WEST), 0.0);
-		
-		delays.put(new VehicleDirection(Direction.SOUTH, Direction.NORTH), 0.0);
-		delays.put(new VehicleDirection(Direction.SOUTH, Direction.EAST), 0.0);
-		delays.put(new VehicleDirection(Direction.SOUTH, Direction.SOUTH), 0.0);
-		delays.put(new VehicleDirection(Direction.SOUTH, Direction.WEST), 0.0);
-		
-		
-		delays.put(new VehicleDirection(Direction.WEST,Direction.NORTH), 0.0);
-		delays.put(new VehicleDirection(Direction.WEST,Direction.EAST), 0.0);
-		delays.put(new VehicleDirection(Direction.WEST,Direction.SOUTH), 0.0);
-		delays.put(new VehicleDirection(Direction.WEST,Direction.WEST), 0.0);
-		
 		averageDelay=0;
 		
-		light = new TrafficLight(peachtree.getEndTime(),lightTimes);
+		light = new TrafficLight(peachtree.getEndTime(),lightTimes,id);
 	
-		//setup traffic light times
-		/*
-		lightTimes = new HashMap<VehicleDirection,Integer>();
+		if(id == PTIntersection.TENTH)
+			this.PedestrianProb = 0.7;
+		else if(id == PTIntersection.ELEVENTH)
+			this.PedestrianProb = 0.5;
+		else if(id == PTIntersection.TWELFTH)
+			this.PedestrianProb = 0.4;
+		else if(id == PTIntersection.THIRTEENTH)
+			this.PedestrianProb = 0.3;
+		else if(id == PTIntersection.FOURTEENTH)
+			this.PedestrianProb = 0.8;
+		else
+			this.PedestrianProb = 0.0;
 		
-		lightTimes.put(new VehicleDirection(Direction.NORTH,Direction.NORTH), 0);
-		lightTimes.put(new VehicleDirection(Direction.NORTH,Direction.EAST), 0);
-		lightTimes.put(new VehicleDirection(Direction.NORTH,Direction.SOUTH), 0);
-		lightTimes.put(new VehicleDirection(Direction.NORTH,Direction.WEST), 0);
-		
-		lightTimes.put(new VehicleDirection(Direction.EAST, Direction.NORTH), 0);
-		lightTimes.put(new VehicleDirection(Direction.EAST, Direction.EAST), 0);
-		lightTimes.put(new VehicleDirection(Direction.EAST, Direction.SOUTH), 0);
-		lightTimes.put(new VehicleDirection(Direction.EAST, Direction.WEST), 0);
-		
-		lightTimes.put(new VehicleDirection(Direction.SOUTH, Direction.NORTH), 0);
-		lightTimes.put(new VehicleDirection(Direction.SOUTH, Direction.EAST), 0);
-		lightTimes.put(new VehicleDirection(Direction.SOUTH, Direction.SOUTH), 0);
-		lightTimes.put(new VehicleDirection(Direction.SOUTH, Direction.WEST), 0);
-		
-		
-		lightTimes.put(new VehicleDirection(Direction.WEST,Direction.NORTH), 0);
-		lightTimes.put(new VehicleDirection(Direction.WEST,Direction.EAST), 0);
-		lightTimes.put(new VehicleDirection(Direction.WEST,Direction.SOUTH), 0);
-		lightTimes.put(new VehicleDirection(Direction.WEST,Direction.WEST), 0);
-		*/
-	}
-	/**
-	 *	 
-	 * @return returns delays at intersection
-	 */
-	public HashMap<VehicleDirection, Double> getDelays() {
-		return delays;
 	}
 	/**
 	 * 
@@ -137,7 +94,7 @@ public class Intersection {
 	}
 
 	public String toString() {
-		return "Intersection [delays=" + delays + ", averageDelay="
+		return "Intersection [averageDelay="
 				+ averageDelay + ", id=" + id + "]";
 	}
 /**
@@ -168,14 +125,10 @@ public class Intersection {
  * @param direction	direction that car is going
  * @return queue delay
  */
-	public int getDelay(int time, VehicleDirection direction) {
+public int getDelay(int time, VehicleDirection direction) {
 		
 		//System.out.println(light);
 		return light.getDelay(time, direction);
-	}
-public int getDelay(int time, VehicleDirection direction, Vehicle vehicle) {
-	// TODO Auto-generated method stub
-	return light.getDelay(time, direction,vehicle);
 }
 public int getProcessingTime(Vehicle vehicle) {
 	return 5;
@@ -185,6 +138,18 @@ public TrafficLight getLight() {
 }
 public Peachtree getPeachtree() {
 	return peachtree;
+}
+public double getPedestrianProb(){
+	
+	return this.PedestrianProb; 
+}
+public int getQueueSize(VehicleDirection direction){
+	
+	return intersectionQs.get(direction).getQueue().size();
+}
+public MyQueue<Vehicle> getQueue(VehicleDirection direction){
+	
+	return intersectionQs.get(direction).getQueue();
 }
 
 

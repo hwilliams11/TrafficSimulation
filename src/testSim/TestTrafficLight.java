@@ -1,6 +1,8 @@
 package testSim;
 import simApp.Direction;
+import simApp.PTIntersection;
 import simApp.TrafficLight;
+import simApp.TrafficLightTimings;
 import simApp.VehicleDirection;
 
 import java.util.HashMap;
@@ -16,13 +18,13 @@ public class TestTrafficLight {
 		VehicleDirection ew = new VehicleDirection(Direction.EAST,Direction.WEST);
 		
 		
-		HashMap<VehicleDirection,Integer> hm = new HashMap<VehicleDirection,Integer>();
-		hm.put(ns, 40);
-		hm.put(en, 30);
-		hm.put(ew, 30);
-		hm.put(ne, 20);
+		HashMap<VehicleDirection,TrafficLightTimings> hm = new HashMap<VehicleDirection,TrafficLightTimings>();
+		hm.put(ns, new TrafficLightTimings( 40, 5, 2 ));
+		hm.put(en, new TrafficLightTimings( 30, 5, 2 ));
+		hm.put(ew, new TrafficLightTimings( 30, 5, 2 ));
+		hm.put(ne, new TrafficLightTimings( 20, 5, 2 ));
 		
-		TrafficLight tl = new TrafficLight( END_TIME,hm );
+		TrafficLight tl = new TrafficLight( END_TIME,hm,PTIntersection.ELEVENTH );
 		System.out.println(tl);
 		int delay;
 		
