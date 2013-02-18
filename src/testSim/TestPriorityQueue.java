@@ -9,7 +9,42 @@ import java.util.Random;
 
 public class TestPriorityQueue {
 
-	public static void main(String[]args){
+	public static void testInsert(){
+		
+		//for different N create a priority queue and insert each value into the queue
+		//record the average insert time.
+		PriorityQueue<Integer> pq = new PriorityQueue<Integer>( new IntComparator() );
+		Random rand = new Random();
+		final int MAX_VALUE = 1000000;
+		
+		int [] nValues = {100,1000,10000,100000,1000000,10000000,20000000};
+		double [] averageTimes = new double[nValues.length];
+		
+		//generate N random numbers and insert into the priority queu
+		for( int i=0;i < nValues.length;i++ ){
+			
+			int N = nValues[i];
+			//pq.clear();
+			pq = new PriorityQueue<Integer>( new IntComparator() );
+			
+			long start = System.currentTimeMillis();
+			for( int j=0;j<N;j++){
+				
+				int nextVal = rand.nextInt( MAX_VALUE );
+				
+				//System.out.println("J: "+j);
+				pq.insert( nextVal );
+				
+				//averageTimes[i]+= (end-start);
+			}
+			//averageTimes[i] = averageTimes[i]/N;
+			long end = System.currentTimeMillis();
+			averageTimes[i] = (end-start);
+		}
+		for( int i=0;i<averageTimes.length;i++)
+			System.out.println(nValues[i]+", "+averageTimes[i]);
+	}
+	public static void testCorrect(){
 		PriorityQueue<Integer> pq = new PriorityQueue<Integer>(new IntComparator());
 		final int NUM_VALS = 10;
 		List<Integer> list2 = new ArrayList<Integer>();
@@ -57,6 +92,10 @@ public class TestPriorityQueue {
 		System.out.println(list2);
 		System.out.println( allVals );
 		System.out.println("Success!");
+	}
+	public static void main(String[]args){
+
+		testInsert();
 	}
 	
 	

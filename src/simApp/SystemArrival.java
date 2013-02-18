@@ -30,7 +30,8 @@ public class SystemArrival extends TrafficEvent {
 		VehicleISInfo vinfo = peachtree.nextIntersection( vehicle );
 		Intersection is = vinfo.getIntersection();
 		VehicleDirection direction = vinfo.getDirection();
-		System.out.printf("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s\n", "SystemArrival","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection());
+		String output = String.format("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s\n", "SystemArrival","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection());
+		peachtree.getSimOutput().write( output );
 		IntersectionQArrival iqa = new IntersectionQArrival(is,direction,vehicle,travelTime+time);
 		
 		return iqa;

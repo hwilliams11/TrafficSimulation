@@ -4,6 +4,7 @@ import generalAlgos.Exponential;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,9 +27,15 @@ import java.util.Set;
 public class Peachtree {
 	
 	
+	
 	private static Peachtree instance = null;
+	private static boolean writeToFile = false;
+	private TrafficStatistics stats;
+	private PeachtreeSimOutput simOutput;
+	private String outputFilename = "TrafficSimulationOutput.txt";
 	protected  final int NUM_CARS=20;
 	protected  final double RATE = 1/8.0;
+	private final double AGGRESSIVENESS_PROB = .08;
 	private  final int END_TIME = 10000;
 	private  int totalCars;
 	private  double averageCarsInSystem;
@@ -50,7 +57,17 @@ public class Peachtree {
 		averageDelay = 0;
 		sumTimeInSystem = 0;
 		averageTimeInSystem = 0;
-		
+		stats = new TrafficStatistics();
+		if( writeToFile ){
+			PrintStream stream = null;
+			try {
+				stream = new PrintStream( new File( outputFilename ));
+			} catch (FileNotFoundException e) {	e.printStackTrace();}
+			simOutput = new PeachtreeSimOutput( stream ); 
+		}
+		else{
+			simOutput = new PeachtreeSimOutput( System.out );
+		}
 		
 	}
 	private void setup(){
@@ -63,6 +80,11 @@ public class Peachtree {
 		intersections.put(PTIntersection.TWELFTH, new Intersection(PTIntersection.TWELFTH,lightTimes.get(PTIntersection.TWELFTH)) );
 		intersections.put(PTIntersection.THIRTEENTH, new Intersection(PTIntersection.THIRTEENTH,lightTimes.get(PTIntersection.THIRTEENTH)) );
 		intersections.put(PTIntersection.FOURTEENTH, new Intersection(PTIntersection.FOURTEENTH,lightTimes.get(PTIntersection.FOURTEENTH)) );
+		
+	}
+	public static void reset() {
+		
+		instance = null;
 		
 	}
 	public static Peachtree getInstance(){
@@ -170,7 +192,11 @@ public class Peachtree {
 				else{
 					PTIntersection ptiOrigin = PTIntersection.getPTIntersection( origin );
 					PTIntersection ptiDest = PTIntersection.getPTIntersection( dest );
+					
+					
 					Vehicle v = new Vehicle(totalCars++,(int)currentTime,ptiOrigin,ptiDest);
+					if( Math.random()<AGGRESSIVENESS_PROB )
+						v.setAggressive( true );
 					arrivals.add( new SystemArrival( v,(int)currentTime) );
 				}
 				
@@ -246,6 +272,7 @@ public class Peachtree {
 	public  void updateStatistics(Intersection is,
 			VehicleDirection direction, int time, Vehicle vehicle) {
 		
+		stats.updateVehicleStats( vehicle, is, direction, time );
 		sumTimeInSystem += (time-vehicle.getSystemArrivalTime());
 		
 		
@@ -461,8 +488,12 @@ public class Peachtree {
 				originDestinationData[mapping][i]=Integer.parseInt( tokens[i+2] );
 			}
 		}
+	
 		scan.close();
-		//System.out.println(originRates);
+		/*
+		 * System.out.println("Rates");
+		 * System.out.println(originRates);
+		 */
 	}
 	public void printOriginDestinationData(){
 		Set<Integer> keySet  = originDestinationMap.keySet();
@@ -544,14 +575,29 @@ public class Peachtree {
 	public int getSIM_TIME_SECONDS() {
 		return SIM_TIME_SECONDS;
 	}
+	public TrafficStatistics getStats() {
+		return stats;
+	}
 	public static void main(String[]args){
 		
 		Peachtree pt = Peachtree.getInstance();
 		pt.getOriginData();
 		int dest = pt.generateRandomDestination(61);
-		List<TrafficEvent> arrivals = pt.createArrivals();
-		//pt.printOriginDestinationData();
-		System.out.println(arrivals.size());
+		//List<TrafficEvent> arrivals = pt.createArrivals();
+		pt.printOriginDestinationData();
+		//System.out.println(arrivals.size());
 		pt.runDistributionTest();
+	}
+	public Object getOutput() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public PeachtreeSimOutput getSimOutput() {
+		return simOutput;
+	}
+	public static void setWriteToFile() {
+		
+		writeToFile  = true;
+		
 	}
 }

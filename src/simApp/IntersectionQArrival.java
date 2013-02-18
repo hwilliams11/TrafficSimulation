@@ -32,9 +32,11 @@ public class IntersectionQArrival extends TrafficEvent {
 						//the car's position in the queue
 		//System.out.println("direction: "+direction);
 		delay = is.getDelay( time, direction );
-		vehicle.setSumDelay( vehicle.getSumDelay()+delay );
+		vehicle.getDelays().add( (double)delay );
+		
 		//System.out.println("ISQArrival intersection: "+is.getId()+" vehicle id: "+vehicle.getId()+" origin: "+vehicle.getOrigin()+" destination: "+vehicle.getDestination()+" direction: "+vehicle.getDirection()+" queue delay: "+delay);
-		System.out.printf("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-15s %-3s\n", "ISQArrival","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),"queue delay:",delay);
+		String output = String.format("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-15s %-3s\n", "ISQArrival","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),"queue delay:",delay);
+		peachtree.getSimOutput().write( output );
 		IntersectionArrival ia = new IntersectionArrival(is,vehicle,direction,time+delay);
 		return ia;
 	}

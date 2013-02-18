@@ -1,4 +1,5 @@
 package simApp;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
@@ -11,14 +12,15 @@ public class Vehicle {
 	
 	private int id;
 	private int systemArrivalTime;
-	private double sumDelay;
 	private PTIntersection origin;
 	private PTIntersection destination;
 	private int timeInSystem;
 	private VehicleDirection direction;
+	private LinkedList<Double>delays;
 	private static int vehicleIds = 0;
 	private static int vehicleTime = 0;
 	private Queue<VehicleISInfo> route;
+	private boolean aggressive;
 	
 	public Vehicle(int id, int systemArrivalTime, PTIntersection origin, PTIntersection destination) {
 		this.id = id;
@@ -26,6 +28,7 @@ public class Vehicle {
 		this.origin = origin;
 		this.destination = destination;
 		route = new MyQueue<VehicleISInfo>();
+		delays = new LinkedList<Double>();
 	}
 /**
  * Creates a random vehicle and its entry point and destination
@@ -80,13 +83,6 @@ public class Vehicle {
 	}
 	/**
 	 * 
-	 * @return sum of all delays that a car has accumulated
-	 */
-	public double getSumDelay() {
-		return sumDelay;
-	}
-	/**
-	 * 
 	 * @return origin of car
 	 */
 	public PTIntersection getOrigin() {
@@ -131,13 +127,6 @@ public class Vehicle {
 		this.systemArrivalTime = systemArrivalTime;
 	}
 	/**
-	 * Set sum of delays
-	 * @param sumDelay new sum
-	 */
-	public void setSumDelay(double sumDelay) {
-		this.sumDelay = sumDelay;
-	}
-	/**
 	 * Set origin of vehicle
 	 * @param origin new origin
 	 */
@@ -165,12 +154,21 @@ public class Vehicle {
 	public void setDirection(VehicleDirection direction) {
 		this.direction = direction;
 	}
+	public boolean isAggressive() {
+		return aggressive;
+	}
+	public void setAggressive(boolean aggressive) {
+		this.aggressive = aggressive;
+	}
+	public LinkedList<Double> getDelays() {
+		return delays;
+	}
 	@Override
 	public String toString() {
 		return "Vehicle [id=" + id + ", directionComingFrom="
 				+ direction + ", origin=" + origin + ", destination="
 				+ destination + ", systemArrivalTime=" + systemArrivalTime
-				+ ", sumDelay=" + sumDelay + ", timeInSystem=" + timeInSystem+ "]";
+				 + ", timeInSystem=" + timeInSystem+ "]";
 	}	
 	
 }

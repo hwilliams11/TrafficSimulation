@@ -11,7 +11,7 @@ import java.util.HashMap;
  */
 public class Intersection {
 	
-	private HashMap<VehicleDirection, MyQueue<Vehicle>> intersectionQs;
+	private HashMap<VehicleDirection, QueueInfo> intersectionQs;
 	//private HashMap<VehicleDirection,Integer> lightTimes;
 	private TrafficLight light;
 	private HashMap<VehicleDirection,Double> delays;
@@ -29,28 +29,29 @@ public class Intersection {
 		
 		peachtree = Peachtree.getInstance();
 		
-		intersectionQs = new HashMap<VehicleDirection,MyQueue<Vehicle>>();
+		intersectionQs = new HashMap<VehicleDirection,QueueInfo>();
+		int queuelen = 8;
 		
-		intersectionQs.put(new VehicleDirection(Direction.NORTH,Direction.NORTH), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.NORTH,Direction.EAST), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.NORTH,Direction.SOUTH), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.NORTH,Direction.WEST), new MyQueue<Vehicle>());
+		intersectionQs.put(VehicleDirection.NN, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.NE, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.NS, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.NW, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		
-		intersectionQs.put(new VehicleDirection(Direction.EAST, Direction.NORTH), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.EAST, Direction.EAST), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.EAST, Direction.SOUTH), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.EAST, Direction.WEST), new MyQueue<Vehicle>());
+		intersectionQs.put(VehicleDirection.EN, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.EE, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.ES, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.EW, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		
-		intersectionQs.put(new VehicleDirection(Direction.SOUTH, Direction.NORTH), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.SOUTH, Direction.EAST), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.SOUTH, Direction.SOUTH), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.SOUTH, Direction.WEST), new MyQueue<Vehicle>());
+		intersectionQs.put(VehicleDirection.SN, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.SE, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.SS, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.SW, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		
 		
-		intersectionQs.put(new VehicleDirection(Direction.WEST,Direction.NORTH), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.WEST,Direction.EAST), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.WEST,Direction.SOUTH), new MyQueue<Vehicle>());
-		intersectionQs.put(new VehicleDirection(Direction.WEST,Direction.WEST), new MyQueue<Vehicle>());
+		intersectionQs.put(VehicleDirection.WN, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.WE, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.WS, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
+		intersectionQs.put(VehicleDirection.WW, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		
 		//intitialize delays 
 		delays = new HashMap<VehicleDirection,Double>();
@@ -117,7 +118,7 @@ public class Intersection {
 	 * 
 	 * @return returns the queues at the intersection
 	 */
-	public HashMap<VehicleDirection, MyQueue<Vehicle>> getIntersectionQs() {
+	public HashMap<VehicleDirection, QueueInfo> getIntersectionQs() {
 		return intersectionQs;
 	}
 /**
@@ -146,7 +147,7 @@ public class Intersection {
  */
 	public void addToQueue(Vehicle vehicle, VehicleDirection direction) {
 		
-		intersectionQs.get(direction).add(vehicle);
+		intersectionQs.get(direction).getQueue().add(vehicle);
 	//	System.out.println("Addition: Queue size "+direction+" : "+intersectionQs.get(direction).size());
 		
 	}
@@ -157,7 +158,7 @@ public class Intersection {
  */
 	public Vehicle removeFromQueue(VehicleDirection direction) {
 		
-		Vehicle v =  intersectionQs.get(direction).remove();
+		Vehicle v =  intersectionQs.get(direction).getQueue().remove();
 	//	System.out.println("Removal: Queue size "+direction+" : "+intersectionQs.get(direction).size());
 		return v;
 	}
@@ -172,8 +173,18 @@ public class Intersection {
 		//System.out.println(light);
 		return light.getDelay(time, direction);
 	}
+public int getDelay(int time, VehicleDirection direction, Vehicle vehicle) {
+	// TODO Auto-generated method stub
+	return light.getDelay(time, direction,vehicle);
+}
 public int getProcessingTime(Vehicle vehicle) {
 	return 5;
+}
+public TrafficLight getLight() {
+	return light;
+}
+public Peachtree getPeachtree() {
+	return peachtree;
 }
 
 

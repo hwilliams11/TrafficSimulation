@@ -20,7 +20,8 @@ public class PriorityQueue<AnyType> {
 	}
 	public PriorityQueue(int size,Comparator<AnyType> cmp){
 		this.cmp = cmp;
-		pq = new ArrayList<AnyType>(size);
+		//pq = new ArrayList<AnyType>(size);
+		pq = new ArrayList<AnyType>();
 		pq.add( null );
 		size = 0;
 	}
@@ -152,5 +153,10 @@ public class PriorityQueue<AnyType> {
 			list.add(val);
 		}
 		return list;
+	}
+	public void clear(){
+		pq.clear();
+		pq.add( null );
+		size=0;
 	}
 }

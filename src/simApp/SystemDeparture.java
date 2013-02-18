@@ -22,9 +22,11 @@ public class SystemDeparture extends TrafficEvent {
 	public TrafficEvent event(){
 		
 		//System.out.println( "SystemDeparture id:"+vehicle.getId()+" time: "+time+" origin: "+vehicle.getOrigin()+" destination: "+vehicle.getDestination()+" going "+vehicle.getDirection().getTo()+" on "+vehicle.getDestination());
-		System.out.printf("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-6s %-6s %-15s\n", "SystemDeparture","intersection:",is.getId(),
+		String output = String.format("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-6s %-6s %-15s\n", "SystemDeparture","intersection:",is.getId(),
 				"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),
 				"going:",vehicle.getDirection().getTo()+" on:",vehicle.getDestination());
+		
+		peachtree.getSimOutput().write( output );
 		peachtree.updateStatistics(is,direction,time,vehicle);
 		return null;
 	}

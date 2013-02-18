@@ -35,7 +35,9 @@ public class IntersectionDeparture extends TrafficEvent{
 		vehicle.setDirection(direction);
 		IntersectionQArrival iqa = new IntersectionQArrival( nextIs,direction,vehicle,time+travelTime);
 		
-		System.out.printf("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-15s %-3s %-15s %-15s\n", "ISDeparture","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),"leaving:",is.getId()," to intersection",nextIs.getId());
+		String output = String.format("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-15s %-3s %-15s %-15s\n", "ISDeparture","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),"leaving:",is.getId()," to intersection",nextIs.getId());
+		peachtree.getSimOutput().write( output );
+		
 		return iqa;
 		
 		

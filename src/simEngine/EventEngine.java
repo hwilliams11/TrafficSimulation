@@ -40,7 +40,7 @@ public class EventEngine{
 		Scanner scan = null;
 		
 		if( pressEnter )
-			scan = new Scanner(System.in);
+			scan = new Scanner(System.in); 
 		
 		while( !futureEventList.isEmpty()  ){
 			

@@ -15,6 +15,12 @@ public class TrafficLight {
 	
 ArrayList<TrafficTime> lightTimes;
 
+public ArrayList<TrafficTime> getLightTimes() {
+	return lightTimes;
+}
+public void setLightTimes(ArrayList<TrafficTime> lightTimes) {
+	this.lightTimes = lightTimes;
+}
 public TrafficLight(int endTime,HashMap<VehicleDirection,Integer> dirTimes){
 
 	lightTimes = createTimes(endTime,dirTimes);
@@ -31,6 +37,10 @@ public TrafficLight(int endTime,HashMap<VehicleDirection,Integer> dirTimes){
 public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 	
 	
+		Peachtree pt = Peachtree.getInstance();
+		if( pt.getIntersection(PTIntersection.THIRTEENTH).getLight() == this ){
+			
+		}
 		if( vehicleDirection.rightTurn() )
 			return 0;
 		int ind = Collections.binarySearch(lightTimes, new TrafficTime(myTime,null));
@@ -53,6 +63,37 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 		}
 		
 	}
+public int getDelay(int myTime, VehicleDirection vehicleDirection, Vehicle v) {
+	
+	
+	if( vehicleDirection.rightTurn() )
+		return 0;
+	int ind = Collections.binarySearch(lightTimes, new TrafficTime(myTime,null));
+	//System.out.println("ind: "+ind);
+	if( ind < 0 ){
+		ind = -1*ind-1;
+		if( ind > 0 )
+			ind--;
+	}
+	//System.out.println("ind: "+ind);
+	TrafficTime t = lightTimes.get(ind);
+	if( canGo(t,vehicleDirection) ){
+		//System.out.println("At time: "+myTime+" Go!!!");
+		return 0;
+	}
+	else{
+		int nextTime = findNextGo( myTime,ind,vehicleDirection, v );
+		//System.out.println("At time: "+myTime+" Gotta wait "+vehicleDirection+" delay="+(nextTime-myTime));
+		return nextTime - myTime;
+	}
+	
+}
+private int findNextGo(int myTime, int ind, VehicleDirection vehicleDirection,
+		Vehicle v) {
+	
+	
+	return 0;
+}
 /**
  * Determines the next timestamp that this vehicle will be able to move in its queue
  * @param myTime - vehicle time

@@ -9,26 +9,26 @@ public class VehicleDirection {
 	private Direction from;
 	private Direction to;
 	
-	protected static VehicleDirection NN = new VehicleDirection(Direction.NORTH,Direction.NORTH );
-	protected static VehicleDirection EE = new VehicleDirection(Direction.EAST,Direction.EAST );
-	protected static VehicleDirection SS = new VehicleDirection(Direction.SOUTH,Direction.NORTH );
-	protected static VehicleDirection WW = new VehicleDirection(Direction.WEST,Direction.WEST );
+	public static VehicleDirection NN = new VehicleDirection(Direction.NORTH,Direction.NORTH );
+	public static VehicleDirection NE = new VehicleDirection(Direction.NORTH,Direction.EAST );
+	public static VehicleDirection NS = new VehicleDirection(Direction.NORTH,Direction.SOUTH );
+	public static VehicleDirection NW = new VehicleDirection(Direction.NORTH,Direction.WEST );
 	
-	protected static VehicleDirection NS = new VehicleDirection(Direction.NORTH,Direction.SOUTH);
-	protected static VehicleDirection EW = new VehicleDirection(Direction.EAST,Direction.WEST);
-	protected static VehicleDirection SN = new VehicleDirection(Direction.SOUTH,Direction.NORTH);
-	protected static VehicleDirection WE = new VehicleDirection(Direction.WEST,Direction.EAST);
+	public static VehicleDirection EN = new VehicleDirection(Direction.EAST,Direction.NORTH);
+	public static VehicleDirection EE = new VehicleDirection(Direction.EAST,Direction.EAST);
+	public static VehicleDirection ES = new VehicleDirection(Direction.EAST,Direction.SOUTH);
+	public static VehicleDirection EW = new VehicleDirection(Direction.EAST,Direction.WEST);
 	
-	protected static VehicleDirection NE = new VehicleDirection(Direction.NORTH,Direction.EAST);
-	protected static VehicleDirection ES = new VehicleDirection(Direction.EAST,Direction.SOUTH);
-	protected static VehicleDirection SW = new VehicleDirection(Direction.SOUTH,Direction.WEST);
-	protected static VehicleDirection WN = new VehicleDirection(Direction.WEST,Direction.NORTH);
+	public static VehicleDirection SN = new VehicleDirection(Direction.SOUTH,Direction.NORTH);
+	public static VehicleDirection SE = new VehicleDirection(Direction.SOUTH,Direction.EAST);
+	public static VehicleDirection SS = new VehicleDirection(Direction.SOUTH,Direction.SOUTH);
+	public static VehicleDirection SW = new VehicleDirection(Direction.SOUTH,Direction.WEST);
 	
-	protected static VehicleDirection NW = new VehicleDirection(Direction.NORTH,Direction.WEST);
-	protected static VehicleDirection EN = new VehicleDirection(Direction.EAST,Direction.NORTH);
-	protected static VehicleDirection SE = new VehicleDirection(Direction.SOUTH,Direction.EAST);
-	protected static VehicleDirection WS = new VehicleDirection(Direction.WEST,Direction.SOUTH);
-	
+	public static VehicleDirection WN = new VehicleDirection(Direction.WEST,Direction.NORTH);
+	public static VehicleDirection WE = new VehicleDirection(Direction.WEST,Direction.EAST);
+	public static VehicleDirection WS = new VehicleDirection(Direction.WEST,Direction.SOUTH);
+	public static VehicleDirection WW = new VehicleDirection(Direction.WEST,Direction.WEST);
+		
 	public VehicleDirection(Direction from,Direction to){
 		
 		this.from = from;
