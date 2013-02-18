@@ -8,7 +8,7 @@ import simEngine.EventEngine;
 
 public class PeachtreeDriver {
 
-	private final static int NUM_RUNS = 2;
+	private final static int NUM_RUNS = 10;
 	private final static int MEAN = 0;
 	private final static int HALF_WIDTH = 1;
 	

@@ -18,6 +18,7 @@ public class TrafficLight {
 ArrayList<TrafficTime> lightTimes;
 PTIntersection id;
 
+
 public TrafficLight(int endTime,HashMap<VehicleDirection,TrafficLightTimings> dirTimes, PTIntersection id){
 
 	lightTimes = createTimes(endTime,dirTimes);
@@ -36,11 +37,15 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 	
 		int maxPedestrianDelay = 5;
 		int perceptiontime = 4;
+		Peachtree pt = Peachtree.getInstance();
+		
 		if( vehicleDirection.rightTurn() ){
 			
 			/* Check for pedestrians */
 			if(Pedestrians()){
-				System.out.println("Pedestrians Crossing !!!!! Right turn delayed!");
+				if( !pt.getWritetoFile() ){
+					System.out.println("Pedestrians Crossing !!!!! Right turn delayed!");
+				}
 				RandomGenerator r = new RandomGenerator();
 				return (int)(maxPedestrianDelay*r.xorrandDouble());
 			}
@@ -63,7 +68,9 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 				
 				/* Check for Pedestrians */
 				if(Pedestrians()){
-					System.out.println("Pedestrians Crossing !!!!!");
+					if( !pt.getWritetoFile() ){
+						System.out.println("Pedestrians Crossing !!!!!");
+					}
 					RandomGenerator r = new RandomGenerator();
 					return (int)(maxPedestrianDelay*r.xorrandDouble());
 				}
@@ -75,8 +82,9 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 				 */
 				if(this.id == PTIntersection.ELEVENTH || this.id == PTIntersection.TWELFTH){
 					
-					System.out.println("Left turns on 11th or 12th street. Wait for some cars to pass!");
-					Peachtree pt = Peachtree.getInstance();
+					if( !pt.getWritetoFile() ){
+						System.out.println("Left turns on 11th or 12th street. Wait for some cars to pass!");
+					}
 					int qsize = pt.getIntersection(id).getQueueSize(vehicleDirection);
 					RandomGenerator r = new RandomGenerator();
 					int numcarspassed = (int)(qsize*r.xorrandDouble());
@@ -98,7 +106,9 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 					
 					int pdelay = 0;
 					if(Pedestrians()){
-						System.out.println("Pedestrians Crossing !!!!!");
+						if( ! pt.getWritetoFile() ){
+							System.out.println("Pedestrians Crossing !!!!!");
+						}
 						pdelay = (int)(maxPedestrianDelay*r.xorrandDouble());
 					}
 					
@@ -110,7 +120,9 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 		}
 		else{
 			int nextTime = findNextGo( myTime,ind,vehicleDirection );
-			System.out.println("At time: "+myTime+" Gotta wait "+vehicleDirection+" delay="+(nextTime-myTime));
+			if( !pt.getWritetoFile() ){
+				System.out.println("At time: "+myTime+" Gotta wait "+vehicleDirection+" delay="+(nextTime-myTime));
+			}
 			return nextTime - myTime;
 		}
 		
