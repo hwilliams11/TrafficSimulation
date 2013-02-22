@@ -13,13 +13,14 @@ public class IntersectionArrival extends TrafficEvent {
 
 	private Intersection is;
 	private VehicleDirection direction;
-	
+	private TrafficStatistics stats; 
 	
 public IntersectionArrival(Intersection is, Vehicle v,VehicleDirection direction, double d){
 		
 		super(v,d,EventType.IS_ARRIVAL);
 		this.is = is;
 		this.direction = direction;
+		stats = peachtree.getStats();
 	}
 /**
  * Remove the vehicle from the queue and schedule a departure
@@ -89,6 +90,7 @@ public IntersectionArrival(Intersection is, Vehicle v,VehicleDirection direction
 		//System.out.println("DIRECTION: "+direction);
 		
 		Vehicle v2 = is.removeFromQueue( direction );
+		stats.updateIntersectionThroughput(is, time);
 		IntersectionDeparture id = new IntersectionDeparture(is,vehicle,time+processingTime);
 		String output = String.format("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-3s\n", "ISArrival","intersection:",is.getId(),"time",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),"service time:",processingTime);
 		peachtree.getSimOutput().write( output );

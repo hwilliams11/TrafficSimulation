@@ -10,7 +10,7 @@ import simEngine.EventEngine;
 
 public class PeachtreeDriver {
 
-	private final static int NUM_RUNS = 10;
+	private final static int NUM_RUNS = 2;
 	private final static int MEAN = 0;
 	private final static int HALF_WIDTH = 1;
 	private static EventEngine engine;
@@ -71,10 +71,14 @@ public class PeachtreeDriver {
 		for(int i=0;i<NUM_RUNS;i++){
 			System.out.print("Run "+(i+1)+" ");
 			simRuns[i]=runSimulation();
-			maxTemp[i] = simRuns[i].getTimeInSystemInfo()[TrafficStatistics.MAX];
-			avgTemp[i] = simRuns[i].getTimeInSystemInfo()[TrafficStatistics.AVG];
+			maxTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.MAX];
+			avgTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.AVG];
 			//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.MAX]);
 			//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.AVG]);
+			simRuns[i].printOrigDestData();
+			simRuns[i].printIntersectionThroughput();
+			System.out.println( simRuns[i].getTimeInSystemMaxAvg(
+					new OrigDestData(PTIntersection.PEACHTREE_NORTH, PTIntersection.PEACHTREE_SOUTH))[TrafficStatistics.AVG] );
 		}
 		
 	

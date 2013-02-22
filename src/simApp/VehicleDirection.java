@@ -4,7 +4,7 @@ package simApp;
  * Vehicle Direction class holds the direction that a vehicle is traveling
  * @author Holly Wiliams
  */
-public class VehicleDirection {
+public class VehicleDirection implements Comparable<VehicleDirection> {
 	
 	private Direction from;
 	private Direction to;
@@ -140,6 +140,30 @@ public boolean leftTurn() {
 	if( from == Direction.NORTH && to == Direction.EAST )
 		return true;
 	return false;
+}
+@Override
+public int compareTo(VehicleDirection arg0) {
+	
+	//NORTH = 1 EAST = 3 SOUTH = 2 WEST = 4
+	int [][]vd = new int[2][2];
+	
+	for(int i=0;i<2;i++){
+		
+		switch( from ){
+			case NORTH: vd[i][0] = 1;break;
+			case EAST: vd[i][0] = 1;break;
+			case SOUTH: vd[i][0] = 1;break;
+			case WEST: vd[i][0] = 1;break;
+		}
+		switch( to ){
+			case NORTH: vd[i][1] = 1;break;
+			case EAST: vd[i][1] = 2;break;
+			case SOUTH: vd[i][1] = 3;break;
+			case WEST: vd[i][1] = 4;break;
+		}
+	}
+
+	return ( vd[0][0] - vd[1][0])+ (vd[0][1] - vd[1][1] );
 }
 
 }

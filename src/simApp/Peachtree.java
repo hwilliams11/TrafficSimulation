@@ -48,29 +48,38 @@ public class Peachtree {
 	private  HashMap<Integer, OriginInfo> originDestinationMap;
 	private  HashMap<PTIntersection,Intersection> intersections;
 	private  HashMap<Integer, Double> originRates;
-	private  final int SIM_TIME_SECONDS = 7200;
+	private  final static int SIM_TIME_SECONDS = 7200;
 	private final  String trafficLightTimesFile = "lightTimes.txt";
 	private final  String originDestinationDataFile = "originDestinationDistributionData.csv";
 	private boolean useGamma = true;
 	private final String gammaDataFile = "gammaTrafficSim.csv"; 
 	private final int MULT_15MIN = 8;
 	private HashMap<PTIntersection,Double[]> gammaData;
+	private static HashMap<Integer,Integer> simOriginMappings;
 	
 	private Peachtree(){
 		
 		totalCars = 0;
 		stats = new TrafficStatistics();
 		if( writeToFile ){
-			PrintStream stream = null;
-			try {
-				stream = new PrintStream( new File( outputFilename ));
-			} catch (FileNotFoundException e) {	e.printStackTrace();}
-			simOutput = new PeachtreeSimOutput( stream ); 
+
+			simOutput = new PeachtreeSimOutput( outputFilename ); 
 		}
 		else{
 			simOutput = new PeachtreeSimOutput( System.out );
 		}
-		
+		simOriginMappings = new HashMap<Integer,Integer>();
+		simOriginMappings.put(50, 115);
+		simOriginMappings.put(30, 121);
+		simOriginMappings.put(20, 122);
+		simOriginMappings.put(10, 123);
+		simOriginMappings.put(12, 102);
+		simOriginMappings.put(22, 103);
+		simOriginMappings.put(32, 111);
+		simOriginMappings.put(42, 112);
+		simOriginMappings.put(52, 113);
+		simOriginMappings.put( 1, 101);
+		simOriginMappings.put(61, 114);
 		
 	}
 	private void setup(){
@@ -670,7 +679,10 @@ public class Peachtree {
 		
 		return simOutput;
 	}
-	public int getSIM_TIME_SECONDS() {
+	public HashMap<Integer, Integer> getOriginMappings(){
+		return simOriginMappings;
+	}
+	public static int getSIM_TIME_SECONDS() {
 		return SIM_TIME_SECONDS;
 	}
 	public static void setWriteToFile() {
