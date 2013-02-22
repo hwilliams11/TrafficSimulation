@@ -1,5 +1,7 @@
 package simApp;
 
+import generalAlgos.PriorityQueue;
+
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.List;
@@ -11,7 +13,13 @@ public class PeachtreeDriver {
 	private final static int NUM_RUNS = 10;
 	private final static int MEAN = 0;
 	private final static int HALF_WIDTH = 1;
+	private static EventEngine engine;
 	
+	public static PriorityQueue<Event> getFutureEventList(){
+		
+		return engine.getFutureEventList();
+		
+	}
 	public static TrafficStatistics runSimulation(){
 		
 		Comparator<Event> cmp = new EventComparator();
@@ -19,9 +27,10 @@ public class PeachtreeDriver {
 		Peachtree pt = Peachtree.getInstance();
 		List<? extends Event> arrivals = pt.createArrivals();
 		SimulationDone doneTest = new TrafficSimulationDone();
-		EventEngine engine = new EventEngine(cmp,(List<Event>) arrivals,doneTest);
+		engine = new EventEngine(cmp,(List<Event>) arrivals,doneTest);
 		engine.process();
 		TrafficStatistics stats = pt.getStats();
+		System.out.println("Num cars: "+pt.getTotalCars());
 		return stats;
 		
 	}
@@ -60,7 +69,7 @@ public class PeachtreeDriver {
 		double[] avgTemp = new double[NUM_RUNS];
 		
 		for(int i=0;i<NUM_RUNS;i++){
-			System.out.println("Run "+(i+1));
+			System.out.print("Run "+(i+1)+" ");
 			simRuns[i]=runSimulation();
 			maxTemp[i] = simRuns[i].getTimeInSystemInfo()[TrafficStatistics.MAX];
 			avgTemp[i] = simRuns[i].getTimeInSystemInfo()[TrafficStatistics.AVG];
@@ -75,8 +84,6 @@ public class PeachtreeDriver {
 		DecimalFormat fmt = new DecimalFormat("#.000");
 		System.out.println("Max time in system sample max = "+fmt.format(maxCI[0])+" CI: "+fmt.format(maxCI[0] - maxCI[1])+" <= mu <=  "+fmt.format(maxCI[0]+maxCI[1]));
 		System.out.println("Avg time in system sample avg = "+fmt.format(avgCI[0])+" CI: "+fmt.format(avgCI[0] - avgCI[1])+" <= mu <=  "+fmt.format(avgCI[0]+avgCI[1]));
-		
-	
 		
 	}
 

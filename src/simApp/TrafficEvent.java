@@ -12,8 +12,9 @@ public abstract class TrafficEvent extends Event{
 	}
 	protected EventType type;
 	protected Vehicle vehicle;
-	protected int time;
+	protected double time;
 	protected Peachtree peachtree;
+	protected boolean active;
 	
 	/**
 	 * 
@@ -21,12 +22,13 @@ public abstract class TrafficEvent extends Event{
 	 * @param time time event was created
 	 * @param type type of event
 	 */
-	public TrafficEvent(Vehicle vehicle,int time, EventType type){
+	public TrafficEvent(Vehicle vehicle,double time, EventType type){
 		
 		this.vehicle = vehicle;
 		this.time = time;
 		this.type = type;
 		peachtree = Peachtree.getInstance();
+		
 		
 	}
 	public abstract TrafficEvent event();
@@ -36,7 +38,7 @@ public abstract class TrafficEvent extends Event{
 	public Vehicle getVehicle() {
 		return vehicle;
 	}
-	public int getTime() {
+	public double getTime() {
 		return time;
 	}
 	

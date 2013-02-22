@@ -9,7 +9,7 @@ public class IntersectionDeparture extends TrafficEvent{
 
 	private Intersection is;
 	
-	public IntersectionDeparture(Intersection is, Vehicle v,int time){
+	public IntersectionDeparture(Intersection is, Vehicle v,double time){
 		
 		super(v,time,EventType.IS_DEPARTURE);
 		this.is = is;
@@ -34,7 +34,6 @@ public class IntersectionDeparture extends TrafficEvent{
 		
 		vehicle.setDirection(direction);
 		IntersectionQArrival iqa = new IntersectionQArrival( nextIs,direction,vehicle,time+travelTime);
-		
 		String output = String.format("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-15s %-3s %-15s %-15s\n", "ISDeparture","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),"leaving:",is.getId()," to intersection",nextIs.getId());
 		peachtree.getSimOutput().write( output );
 		

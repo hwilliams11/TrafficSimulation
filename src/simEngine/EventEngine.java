@@ -48,14 +48,22 @@ public class EventEngine{
 			Event event = futureEventList.extractMin();
 			if( test!= null && test.done(event))
 				break;
-			Event next = event.event();
 			
-			if( next!= null )
-				futureEventList.insert(next);
+			if( event.getActive() ){
+				
+					Event next = event.event();
+				
+				if( next!= null )
+					futureEventList.insert(next);
+				
+			}
 			if( pressEnter)
 				scan.nextLine();
 			
 		}
+	}
+	public PriorityQueue<Event> getFutureEventList() {
+		return futureEventList;
 	}
 
 }

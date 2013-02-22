@@ -35,20 +35,29 @@ public class TrafficStatistics {
 	 * - origin-destination distribution
 	*/
 	private HashMap<Integer,VehicleStatsInfo> vehicleStats;
+	private HashMap<Integer,VehicleStatsInfo> fullCorridorStats;
 	protected final static int MAX = 0;
 	protected final static int AVG = 1;
 	
 	public TrafficStatistics(){
 		
 		vehicleStats = new HashMap<Integer,VehicleStatsInfo>();
+		fullCorridorStats = new HashMap<Integer,VehicleStatsInfo>();
 	}
 	public void updateVehicleStats(Vehicle vehicle, Intersection is,
-			VehicleDirection direction, int time) {
+			VehicleDirection direction, double time) {
 		
-		int totalTime = time - vehicle.getSystemArrivalTime();
-		VehicleStatsInfo vinfo = new VehicleStatsInfo( totalTime, vehicle.getDelays() );
+		if( (vehicle.getOrigin() == PTIntersection.PEACHTREE_NORTH && 
+				vehicle.getDestination() == PTIntersection.PEACHTREE_SOUTH) ||
+				(vehicle.getOrigin() == PTIntersection.PEACHTREE_SOUTH && 
+				vehicle.getDestination() == PTIntersection.PEACHTREE_NORTH)){
 		
-		vehicleStats.put( vehicle.getId(), vinfo );
+			double totalTime = time - vehicle.getSystemArrivalTime();
+			VehicleStatsInfo vinfo = new VehicleStatsInfo( totalTime, vehicle.getDelays() );
+			
+			vehicleStats.put( vehicle.getId(), vinfo );
+			//fullCorridorStats.put( vehicle.getId(),vinfo );
+		}
 	}
 	public double[] getTimeInSystemInfo(){
 		

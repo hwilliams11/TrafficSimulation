@@ -10,7 +10,7 @@ public class SystemDeparture extends TrafficEvent {
 	private Intersection is;
 	private VehicleDirection direction;
 	
-	public SystemDeparture(Intersection is, Vehicle v, VehicleDirection direction,int time){
+	public SystemDeparture(Intersection is, Vehicle v, VehicleDirection direction,double time){
 		
 		super(v, time,EventType.SYSTEM_DEPARTURE);
 		this.is = is;

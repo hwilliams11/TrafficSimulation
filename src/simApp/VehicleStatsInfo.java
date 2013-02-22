@@ -22,7 +22,7 @@ public class VehicleStatsInfo {
 		timeInSystem = 0;
 	}
 
-	public VehicleStatsInfo(int timeInSystem, LinkedList<Double> delays) {
+	public VehicleStatsInfo(double timeInSystem, LinkedList<Double> delays) {
 	
 		this.timeInSystem = timeInSystem;
 		this.delays = delays;

@@ -1,0 +1,3 @@
+IntersectionArrival.java:					IntersectionArrival ia = new IntersectionArrival(is,vehicle,direction,time+myDelay);
+IntersectionArrival.java:						IntersectionArrival currIa = new IntersectionArrival( is,vehicle,direction,lastTime+nextIsdelay );
+IntersectionQArrival.java:		IntersectionArrival ia = new IntersectionArrival(is,vehicle,direction,time+delay);

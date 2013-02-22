@@ -2,6 +2,8 @@ package generalAlgos;
 
 import java.util.*;
 
+import testSim.IntComparator;
+
 /**
  * Heap based Priority Queue
  *
@@ -21,7 +23,7 @@ public class PriorityQueue<AnyType> {
 	public PriorityQueue(int size,Comparator<AnyType> cmp){
 		this.cmp = cmp;
 		//pq = new ArrayList<AnyType>(size);
-		pq = new ArrayList<AnyType>();
+		pq = new ArrayList<AnyType>(size);
 		pq.add( null );
 		size = 0;
 	}

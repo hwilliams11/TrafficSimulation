@@ -29,11 +29,11 @@ public TrafficLight(int endTime,HashMap<VehicleDirection,TrafficLightTimings> di
  * getDelay computes the time a vehicle must wait before it can move towards the intersection
  * This number is computed based on the traffic light timings of a particular intersection
  * 
- * @param myTime  current time that a vehicle enters a queue
+ * @param time  current time that a vehicle enters a queue
  * @param vehicleDirection  the direction that the vehicle is trying to turn
  * @return  the time a vehicle must wait before its queues turn 
  */
-public int getDelay(int myTime, VehicleDirection vehicleDirection) {
+public double getDelay(double time, VehicleDirection vehicleDirection) {
 	
 		int maxPedestrianDelay = 5;
 		int perceptiontime = 4;
@@ -51,7 +51,7 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 			}
 			return 0;
 		}
-		int ind = Collections.binarySearch(lightTimes, new TrafficTime(myTime,null));
+		int ind = Collections.binarySearch(lightTimes, new TrafficTime(time,null));
 		//System.out.println("ind: "+ind);
 		if( ind < 0 ){
 			ind = -1*ind-1;
@@ -119,22 +119,22 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 			return perceptiontime;
 		}
 		else{
-			int nextTime = findNextGo( myTime,ind,vehicleDirection );
+			double nextTime = findNextGo( time,ind,vehicleDirection );
 			if( !pt.getWritetoFile() ){
-				System.out.println("At time: "+myTime+" Gotta wait "+vehicleDirection+" delay="+(nextTime-myTime));
+				System.out.println("At time: "+time+" Gotta wait "+vehicleDirection+" delay="+(nextTime-time));
 			}
-			return nextTime - myTime;
+			return nextTime - time;
 		}
 		
 	}
 /**
  * Determines the next timestamp that this vehicle will be able to move in its queue
- * @param myTime - vehicle time
+ * @param time - vehicle time
  * @param ind	- index of where time would be placed in the traffic time list
  * @param vehicleDirection	- direction to go
  * @return	- returns time of the next light that this vehicle will be able to move with
  */
-	private int findNextGo(int myTime, int ind, VehicleDirection vehicleDirection) {
+	private double findNextGo(double time, int ind, VehicleDirection vehicleDirection) {
 	
 		for(int i=ind;i<lightTimes.size();i++){
 			if( canGo(lightTimes.get(i),vehicleDirection))
@@ -142,7 +142,7 @@ public int getDelay(int myTime, VehicleDirection vehicleDirection) {
 		}
 		System.out.println("***************************");
 		System.out.println("Error after simulation time");
-		System.out.println(vehicleDirection+" time: "+myTime);
+		System.out.println(vehicleDirection+" time: "+time);
 		System.out.println(this);
 		System.out.println("***************************");
 		System.out.println("Error after simulation time");

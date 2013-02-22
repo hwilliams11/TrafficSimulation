@@ -26,7 +26,7 @@ public class TestTrafficLight {
 		
 		TrafficLight tl = new TrafficLight( END_TIME,hm,PTIntersection.ELEVENTH );
 		System.out.println(tl);
-		int delay;
+		double delay;
 		
 		for(int i=0;i<END_TIME;i+=50){
 			delay = tl.getDelay( i, new VehicleDirection(Direction.SOUTH,Direction.NORTH));

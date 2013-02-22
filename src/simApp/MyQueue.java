@@ -98,13 +98,14 @@ public class MyQueue<AnyType> implements Queue<AnyType>{
 	
 	public AnyType peek() {
 		// TODO Auto-generated method stub
-		return null;
+		return queue.getFirst();
 	}
 
 	
 	public AnyType poll() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		AnyType item = queue.removeFirst();
+		return item;
 	}
 
 	

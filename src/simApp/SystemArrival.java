@@ -9,10 +9,10 @@ import java.util.ArrayList;
  */
 public class SystemArrival extends TrafficEvent {
 	
-	public SystemArrival(Vehicle v,int time){
+	public SystemArrival(Vehicle v,double currentTime){
 		
-		super(v,time,EventType.SYSTEM_ARRIVAL);
-		v.setSystemArrivalTime(time);
+		super(v,currentTime,EventType.SYSTEM_ARRIVAL);
+		v.setSystemArrivalTime(currentTime);
 	}
 /**
  * SystemArrival event that processes a car entering into the system. A car will be placed into an intersection's

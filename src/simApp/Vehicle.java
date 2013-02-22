@@ -10,19 +10,22 @@ import java.util.Random;
  */
 public class Vehicle {
 	
+	public static final int GAP_SIZE = 5;
 	private int id;
-	private int systemArrivalTime;
+	private int len = 5;
+	private double systemArrivalTime;
 	private PTIntersection origin;
 	private PTIntersection destination;
-	private int timeInSystem;
+	private double timeInSystem;
 	private VehicleDirection direction;
 	private LinkedList<Double>delays;
 	private static int vehicleIds = 0;
 	private static int vehicleTime = 0;
 	private Queue<VehicleISInfo> route;
 	private boolean aggressive;
+	private IntersectionArrival lastArrival;
 	
-	public Vehicle(int id, int systemArrivalTime, PTIntersection origin, PTIntersection destination) {
+	public Vehicle(int id, double systemArrivalTime, PTIntersection origin, PTIntersection destination) {
 		this.id = id;
 		this.systemArrivalTime = systemArrivalTime;
 		this.origin = origin;
@@ -78,7 +81,7 @@ public class Vehicle {
 	 * 
 	 * @return time that car arrived into system
 	 */
-	public int getSystemArrivalTime() {
+	public double getSystemArrivalTime() {
 		return systemArrivalTime;
 	}
 	/**
@@ -99,7 +102,7 @@ public class Vehicle {
 	 * 
 	 * @return time that a car has been in the system
 	 */
-	public int getTimeInSystem() {
+	public double getTimeInSystem() {
 		return timeInSystem;
 	}
 	public Queue<VehicleISInfo> getRoute() {
@@ -123,7 +126,7 @@ public class Vehicle {
 	 * Set time of arrival into system
 	 * @param systemArrivalTime new time
 	 */
-	public void setSystemArrivalTime(int systemArrivalTime) {
+	public void setSystemArrivalTime(double systemArrivalTime) {
 		this.systemArrivalTime = systemArrivalTime;
 	}
 	/**
@@ -144,7 +147,7 @@ public class Vehicle {
 	 * Sets the vehcile's time in system
 	 * @param timeInSystem new time
 	 */
-	public void setTimeInSystem(int timeInSystem) {
+	public void setTimeInSystem(double timeInSystem) {
 		this.timeInSystem = timeInSystem;
 	}
 	/**
@@ -163,12 +166,22 @@ public class Vehicle {
 	public LinkedList<Double> getDelays() {
 		return delays;
 	}
+	public IntersectionArrival getLastArrival() {
+		return lastArrival;
+	}
+	public void setLastArrival(IntersectionArrival lastArrival) {
+		this.lastArrival = lastArrival;
+	}
 	@Override
 	public String toString() {
 		return "Vehicle [id=" + id + ", directionComingFrom="
 				+ direction + ", origin=" + origin + ", destination="
 				+ destination + ", systemArrivalTime=" + systemArrivalTime
-				 + ", timeInSystem=" + timeInSystem+ "]";
+				 + ", timeInSystem=" + timeInSystem+ " Last arrival: "+lastArrival+"]";
+	}
+	public int getLen() {
+		
+		return len;
 	}	
 	
 }

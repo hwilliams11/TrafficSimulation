@@ -18,6 +18,7 @@ public class Intersection {
 	private PTIntersection id;
 	private Peachtree peachtree;
 	private double PedestrianProb;
+
 	
 	/**
 	 * Creates an Intersection object at a particular intersection with traffic light times
@@ -30,7 +31,7 @@ public class Intersection {
 		peachtree = Peachtree.getInstance();
 		
 		intersectionQs = new HashMap<VehicleDirection,QueueInfo>();
-		int queuelen = 8;
+		int queuelen = 3;
 		
 		intersectionQs.put(VehicleDirection.NN, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		intersectionQs.put(VehicleDirection.NE, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
@@ -73,6 +74,13 @@ public class Intersection {
 	}
 	/**
 	 * 
+	 * @return returns the id of the intersection
+	 */
+		public PTIntersection getId() {
+			return id;
+		}
+	/**
+	 * 
 	 * @return returns the queues at the intersection
 	 */
 	public HashMap<VehicleDirection, QueueInfo> getIntersectionQs() {
@@ -85,47 +93,14 @@ public class Intersection {
 	public double getAverageDelay() {
 		return averageDelay;
 	}
-/**
- * 
- * @return returns the id of the intersection
- */
-	public PTIntersection getId() {
-		return id;
-	}
 
-	public String toString() {
-		return "Intersection [averageDelay="
-				+ averageDelay + ", id=" + id + "]";
-	}
-/**
- * Adds a vehicle to a particular direction's queue
- * @param vehicle vehicle to add
- * @param direction direction that vehicle is going
- */
-	public void addToQueue(Vehicle vehicle, VehicleDirection direction) {
-		
-		intersectionQs.get(direction).getQueue().add(vehicle);
-	//	System.out.println("Addition: Queue size "+direction+" : "+intersectionQs.get(direction).size());
-		
-	}
-/**
- * Remove the next vehicle in a certain direction's queue
- * @param direction direction that vehicle is turning
- * @return the next vehicle
- */
-	public Vehicle removeFromQueue(VehicleDirection direction) {
-		
-		Vehicle v =  intersectionQs.get(direction).getQueue().remove();
-	//	System.out.println("Removal: Queue size "+direction+" : "+intersectionQs.get(direction).size());
-		return v;
-	}
 /**
  * Gets the time that a car will have to wait before light turns green
  * @param time	time that car entered queue
  * @param direction	direction that car is going
  * @return queue delay
  */
-public int getDelay(int time, VehicleDirection direction) {
+public double getDelay(double time, VehicleDirection direction) {
 		
 		//System.out.println(light);
 		return light.getDelay(time, direction);
@@ -150,6 +125,32 @@ public int getQueueSize(VehicleDirection direction){
 public MyQueue<Vehicle> getQueue(VehicleDirection direction){
 	
 	return intersectionQs.get(direction).getQueue();
+}
+/**
+ * Adds a vehicle to a particular direction's queue
+ * @param vehicle vehicle to add
+ * @param direction direction that vehicle is going
+ */
+	public void addToQueue(Vehicle vehicle, VehicleDirection direction) {
+		
+		intersectionQs.get(direction).getQueue().add(vehicle);
+	//	System.out.println("Addition: Queue size "+direction+" : "+intersectionQs.get(direction).size());
+		
+	}
+/**
+ * Remove the next vehicle in a certain direction's queue
+ * @param direction direction that vehicle is turning
+ * @return the next vehicle
+ */
+	public Vehicle removeFromQueue(VehicleDirection direction) {
+		
+		Vehicle v =  intersectionQs.get(direction).getQueue().remove();
+	//	System.out.println("Removal: Queue size "+direction+" : "+intersectionQs.get(direction).size());
+		return v;
+	}
+public String toString() {
+	return "Intersection [averageDelay="
+			+ averageDelay + ", id=" + id + "]";
 }
 
 

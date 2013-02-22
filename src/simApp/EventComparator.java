@@ -15,7 +15,13 @@ public class EventComparator implements Comparator<Event> {
 	 */
 	public int compare(Event arg0, Event arg1) {
 		
-		return ((TrafficEvent)arg0).time-((TrafficEvent)arg1).time;
+		double diff = ((TrafficEvent)arg0).time-((TrafficEvent)arg1).time;
+		if( diff < 0 )
+			return -1;
+		else if(diff > 0 )
+			return 1;
+		else
+			return 0;
 	}
 
 }

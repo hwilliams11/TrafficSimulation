@@ -25,7 +25,7 @@ public class TestPriorityQueue {
 			
 			int N = nValues[i];
 			//pq.clear();
-			pq = new PriorityQueue<Integer>( new IntComparator() );
+			pq = new PriorityQueue<Integer>( N, new IntComparator() );
 			
 			long start = System.currentTimeMillis();
 			for( int j=0;j<N;j++){
@@ -95,7 +95,7 @@ public class TestPriorityQueue {
 	}
 	public static void main(String[]args){
 
-		testInsert();
+		testCorrect();
 	}
 	
 	
