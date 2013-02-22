@@ -37,4 +37,9 @@ class OrigDestData{
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "OrigDestData [origin=" + origin + ", dest=" + dest + "]";
+	}
+
 }

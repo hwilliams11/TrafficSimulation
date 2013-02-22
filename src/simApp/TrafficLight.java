@@ -193,18 +193,30 @@ public double getDelay(double time, VehicleDirection vehicleDirection) {
 		ArrayList<TrafficTime> traffTimes = new ArrayList<TrafficTime>();
 		int ind = 0;
 		
-		VehicleDirection [] dirKeys = new VehicleDirection[dirTimes.size()];// = (VehicleDirection[]) dirTimes.keySet().toArray();
-		dirTimes.keySet().toArray(dirKeys);
+		//VehicleDirection [] dirKeys = new VehicleDirection[dirTimes.size()];// = (VehicleDirection[]) dirTimes.keySet().toArray();
+		//dirTimes.keySet().toArray(dirKeys);
 		
+	 	VehicleDirection [] dirKeys = new VehicleDirection[8];
+		dirKeys[0] = VehicleDirection.NS;
+		dirKeys[1] = VehicleDirection.SN;
+		dirKeys[2] = VehicleDirection.NE;
+		dirKeys[3] = VehicleDirection.SW;
+		dirKeys[4] = VehicleDirection.EW;
+		dirKeys[5] = VehicleDirection.WE;
+		dirKeys[6] = VehicleDirection.ES;
+		dirKeys[7] = VehicleDirection.WN;
+		 
 		while( currTime < endTime ){
 			
 			VehicleDirection direction = dirKeys[ind];
+			//System.out.println("Dir: "+direction);
 			traffTimes.add( new TrafficTime( currTime,direction));
 			if( ++ind == dirTimes.size())
 				ind = 0;
 			currTime += (dirTimes.get(direction).greentime+dirTimes.get(direction).yellowtime);
 			//System.out.println(currTime);
 		}
+		
 //		for(TrafficTime t:traffTimes)
 //		{
 //			System.out.println(t);

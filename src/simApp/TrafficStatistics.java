@@ -150,14 +150,14 @@ public class TrafficStatistics {
 		
 		OrigDestData[] origDest = new OrigDestData[2];
 		origDest[0] = new OrigDestData(PTIntersection.PEACHTREE_NORTH,PTIntersection.PEACHTREE_SOUTH);
-		origDest[1] = new OrigDestData(PTIntersection.PEACHTREE_NORTH,PTIntersection.PEACHTREE_SOUTH);
+		origDest[1] = new OrigDestData(PTIntersection.PEACHTREE_SOUTH,PTIntersection.PEACHTREE_NORTH);
 		
 		for( int i=0;i<2;i++){
 			
-			Collection<VehicleStatsInfo> coll = vehicleStats.get( origDest[i] );
-			
+			Collection<VehicleStatsInfo> coll = vehicleStats.get( origDest[i] );	
 			for( VehicleStatsInfo vinfo: coll){
 				double time = vinfo.getTimeInSystem();
+				
 				avg += time;
 				if( time > max )
 					max = time;

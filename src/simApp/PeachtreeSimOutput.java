@@ -31,5 +31,9 @@ public class PeachtreeSimOutput {
 		
 		stream.println( string );
 	}
+	public void close() {
+		
+		stream.close();
+	}
 
 }

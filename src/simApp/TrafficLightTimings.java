@@ -2,11 +2,11 @@ package simApp;
 
 public class TrafficLightTimings {
 	
-	int greentime;
-	int redtime;
-	int yellowtime;
+	double greentime;
+	double redtime;
+	double yellowtime;
 	
-	public TrafficLightTimings(int greentime, int yellowtime, int redtime){
+	public TrafficLightTimings(double greentime, double yellowtime, double redtime){
 		
 		this.greentime = greentime;
 		this.yellowtime = yellowtime;

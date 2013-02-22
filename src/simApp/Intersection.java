@@ -11,6 +11,7 @@ import java.util.HashMap;
  */
 public class Intersection {
 	
+	private static Double DEFAULT_PROCTIME = 5.0;
 	private HashMap<VehicleDirection, QueueInfo> intersectionQs;
 	//private HashMap<VehicleDirection,Integer> lightTimes;
 	private TrafficLight light;
@@ -18,6 +19,7 @@ public class Intersection {
 	private PTIntersection id;
 	private Peachtree peachtree;
 	private double PedestrianProb;
+	private double processingTime;
 
 	
 	/**
@@ -26,6 +28,11 @@ public class Intersection {
 	 * @param lightTimes traffic light times at this intersection
 	 */
 	public Intersection(PTIntersection id, HashMap<VehicleDirection,TrafficLightTimings> lightTimes){
+		
+		this( id, lightTimes, DEFAULT_PROCTIME  );
+	}
+	public Intersection(PTIntersection id,HashMap<VehicleDirection, TrafficLightTimings> lightTimes,Double processingTime) {
+		
 		this.id = id;
 		
 		peachtree = Peachtree.getInstance();
@@ -71,6 +78,7 @@ public class Intersection {
 		else
 			this.PedestrianProb = 0.0;
 		
+		this.processingTime = processingTime;
 	}
 	/**
 	 * 
@@ -105,8 +113,8 @@ public double getDelay(double time, VehicleDirection direction) {
 		//System.out.println(light);
 		return light.getDelay(time, direction);
 }
-public int getProcessingTime(Vehicle vehicle) {
-	return 5;
+public double getProcessingTime(Vehicle vehicle) {
+	return processingTime+1;
 }
 public TrafficLight getLight() {
 	return light;

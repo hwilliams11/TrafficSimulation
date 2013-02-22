@@ -28,7 +28,7 @@ public IntersectionArrival(Intersection is, Vehicle v,VehicleDirection direction
 	public TrafficEvent event(){
 		
 		//System.out.println("IntersectionArrival "+is.getId()+": "+is.getId().getValue()+" in queue: "+vehicle.getDirection());
-		int processingTime = is.getProcessingTime(vehicle);
+		double processingTime = is.getProcessingTime(vehicle);
 		//System.out.println("ISArrival intersection: "+is.getId()+" vehicle id: "+vehicle.getId()+" origin: "+vehicle.getOrigin()+" destination: "+vehicle.getDestination()+" direction: "+vehicle.getDirection()+" service time: "+processingTime);
 		
 		Queue<VehicleISInfo> route = vehicle.getRoute();

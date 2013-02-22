@@ -40,7 +40,15 @@ public class PeachtreeDriver {
 		double var = 0;
 		double stdev;
 		double half;
-		double t = 3.25; //for N=10 9 degrees of freedom;
+		double t; //for N=10 9 degrees of freedom;
+		double [] tValues = {	6.314000, 2.920000, 2.353000, 2.132000, 2.015000, 
+								1.943000, 1.895000, 1.860000, 1.833000, 1.812000, 
+								1.796000, 1.782000, 1.771000, 1.761000, 1.753000, 
+								1.746000, 1.740000, 1.734000, 1.729000, 1.725000, 
+								1.721000, 1.717000, 1.714000, 1.711000, 1.708000, 
+								1.706000, 1.703000, 1.701000, 1.699000, 1.697000, 
+								1.684000, 1.671000, 1.664000, 1.660000, 1.646000, 
+								1.645000}; 
 		int N = values.length;
 		double [] res = new double[2];
 		
@@ -53,6 +61,8 @@ public class PeachtreeDriver {
 		}
 		var/=(N-1);
 		stdev = Math.sqrt( var );
+		
+		t = tValues[N-1];
 		
 		half = t*stdev/Math.sqrt(N);
 	
@@ -67,18 +77,21 @@ public class PeachtreeDriver {
 
 		double[] maxTemp = new double[NUM_RUNS];
 		double[] avgTemp = new double[NUM_RUNS];
+		OrigDestData orig = new OrigDestData(PTIntersection.PEACHTREE_SOUTH,PTIntersection.PEACHTREE_NORTH);
 		
 		for(int i=0;i<NUM_RUNS;i++){
 			System.out.print("Run "+(i+1)+" ");
 			simRuns[i]=runSimulation();
 			maxTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.MAX];
 			avgTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.AVG];
+			//maxTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.MAX];
+			//avgTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.AVG];
 			//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.MAX]);
 			//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.AVG]);
 			simRuns[i].printOrigDestData();
 			simRuns[i].printIntersectionThroughput();
-			System.out.println( simRuns[i].getTimeInSystemMaxAvg(
-					new OrigDestData(PTIntersection.PEACHTREE_NORTH, PTIntersection.PEACHTREE_SOUTH))[TrafficStatistics.AVG] );
+		
+
 		}
 		
 	

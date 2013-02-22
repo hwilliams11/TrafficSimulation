@@ -26,9 +26,9 @@ public class IntersectionQArrival extends TrafficEvent {
 	 */
 	public TrafficEvent event(){
 		
-		double delay = 3;	
-		delay = is.getDelay( time, direction );
-		vehicle.getDelays().add( (double)delay );
+		
+		double delay = is.getDelay( time, direction );
+		vehicle.getDelays().add( delay );
 		
 		String output = String.format("%-15s %-10s %-15s %-10s %-15s %-10s %-3s %-7s %-15s %-10s %-15s %-10s %-15s %-15s %-3s\n", "ISQArrival","intersection:",is.getId(),"time:",time,"vehicle id:",vehicle.getId(),"origin:",vehicle.getOrigin(),"destination:",vehicle.getDestination(),"direction:",vehicle.getDirection(),"queue delay:",delay);
 		peachtree.getSimOutput().write( output );

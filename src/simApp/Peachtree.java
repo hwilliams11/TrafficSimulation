@@ -55,6 +55,7 @@ public class Peachtree {
 	private final String gammaDataFile = "gammaTrafficSim.csv"; 
 	private final int MULT_15MIN = 8;
 	private HashMap<PTIntersection,Double[]> gammaData;
+	private String processingFilename = "serverProcessingTime.txt";
 	private static HashMap<Integer,Integer> simOriginMappings;
 	
 	private Peachtree(){
@@ -92,16 +93,39 @@ public class Peachtree {
 	private void setupExpon(){
 		
 		HashMap<PTIntersection,HashMap<VehicleDirection,TrafficLightTimings>> lightTimes = readLightTimes();
+		HashMap<PTIntersection,Double> processingTimes = readProcessingTimes();
+		
 		intersections = new HashMap<PTIntersection,Intersection>();		
 
-		intersections.put(PTIntersection.TENTH, new Intersection(PTIntersection.TENTH,lightTimes.get(PTIntersection.TENTH)) );
-		intersections.put(PTIntersection.ELEVENTH, new Intersection(PTIntersection.ELEVENTH,lightTimes.get(PTIntersection.ELEVENTH)) );
-		intersections.put(PTIntersection.TWELFTH, new Intersection(PTIntersection.TWELFTH,lightTimes.get(PTIntersection.TWELFTH)) );
-		intersections.put(PTIntersection.THIRTEENTH, new Intersection(PTIntersection.THIRTEENTH,lightTimes.get(PTIntersection.THIRTEENTH)) );
-		intersections.put(PTIntersection.FOURTEENTH, new Intersection(PTIntersection.FOURTEENTH,lightTimes.get(PTIntersection.FOURTEENTH)) );
+		intersections.put(PTIntersection.TENTH, new Intersection(PTIntersection.TENTH,lightTimes.get(PTIntersection.TENTH),processingTimes.get(PTIntersection.TENTH)) );
+		intersections.put(PTIntersection.ELEVENTH, new Intersection(PTIntersection.ELEVENTH,lightTimes.get(PTIntersection.ELEVENTH),processingTimes.get(PTIntersection.ELEVENTH)) );
+		intersections.put(PTIntersection.TWELFTH, new Intersection(PTIntersection.TWELFTH,lightTimes.get(PTIntersection.TWELFTH),processingTimes.get(PTIntersection.TWELFTH)) );
+		intersections.put(PTIntersection.THIRTEENTH, new Intersection(PTIntersection.THIRTEENTH,lightTimes.get(PTIntersection.THIRTEENTH),processingTimes.get(PTIntersection.THIRTEENTH)) );
+		intersections.put(PTIntersection.FOURTEENTH, new Intersection(PTIntersection.FOURTEENTH,lightTimes.get(PTIntersection.FOURTEENTH),processingTimes.get(PTIntersection.FOURTEENTH)) );
 		
 	}
 	
+	private HashMap<PTIntersection, Double> readProcessingTimes() {
+		
+		HashMap<PTIntersection, Double> time = new HashMap<PTIntersection, Double>();
+		
+		Scanner scan = null;
+		
+		try {
+			scan = new Scanner( new File(processingFilename) );
+		} catch (FileNotFoundException e) {e.printStackTrace();	}
+		
+		while( scan.hasNext() ){
+			String line = scan.nextLine();
+			String []tokens = line.split(",");
+			
+			int id = Integer.parseInt( tokens[0] );
+			PTIntersection is = PTIntersection.getPTIntersection(id);
+			time.put(is, Double.parseDouble(tokens[1]));
+		}
+		
+		return time;
+	}
 	private void setupGamma(){
 		
 		HashMap<PTIntersection,HashMap<VehicleDirection,TrafficLightTimings>> lightTimes = readLightTimes();
@@ -173,7 +197,7 @@ public class Peachtree {
 			int linenumbr = 1;
 			
 			
-			while( linenumbr != 4 ){
+			while( linenumbr != 5 ){
 			
 				//h.put( new VehicleDirection( Direction.EAST,Direction.NORTH), 0);
 				//h.put( new VehicleDirection( Direction.WEST,Direction.SOUTH), 0);
@@ -233,8 +257,6 @@ public class Peachtree {
 				scan.nextLine();
 			if(scan.hasNext())
 				scan.nextLine();
-			if(scan.hasNext())
-				scan.nextLine();
 		}
 		
 		scan.close();
@@ -242,10 +264,37 @@ public class Peachtree {
 	}
 	public List<TrafficEvent> createArrivals(){
 		
+		//return test();
+		
 		if( useGamma )
 			return createArrivalsGamma();
 		else
 			return createArrivalsExpon();
+		
+	}
+	public List<TrafficEvent> test(){
+		
+		getOriginData();
+		LinkedList<TrafficEvent> arrivals = new LinkedList<TrafficEvent>();
+		double currentTime;
+		
+		currentTime = 0;
+		
+		
+		PTIntersection ptiOrigin = PTIntersection.PEACHTREE_NORTH;
+		double shape = gammaData.get( ptiOrigin )[0];
+		double scale = gammaData.get( ptiOrigin )[1];
+		
+		GammaDistribution gamma = new GammaDistribution(shape,scale);
+		//System.out.println("ORIGIN: "+origin+" rate: "+rate);
+		currentTime += gamma.sample();
+
+		PTIntersection ptiDest = PTIntersection.PEACHTREE_SOUTH;
+		Vehicle v = new Vehicle(totalCars++,(int)currentTime,ptiOrigin,ptiDest);
+		arrivals.add( new SystemArrival( v,currentTime) );
+	
+		return arrivals;
+		
 	}
 	/**
 	 * Creates vehicles and a list of SystemArrivals
@@ -294,7 +343,15 @@ public class Peachtree {
 		getOriginData();
 		LinkedList<TrafficEvent> arrivals = new LinkedList<TrafficEvent>();
 		double currentTime;
+		String interArrivaltimes = "interArrivalTimes.txt";
+		PeachtreeSimOutput 	interArrivalOutput;
 		
+		if( writeToFile ){
+			interArrivalOutput = new PeachtreeSimOutput( interArrivaltimes );
+		}
+		else{
+			interArrivalOutput = new PeachtreeSimOutput();
+		}
 		
 		for( Integer origin: originDestinationMap.keySet() ){
 			
@@ -311,8 +368,11 @@ public class Peachtree {
 				
 				
 				dest = instance.generateRandomDestination( origin );
-				//currentTime += Exponential.expon(rate);
-				currentTime += gamma.sample();
+				
+				double iaTime = gamma.sample();
+				currentTime += iaTime;
+				if( (ptiOrigin.getValue() == PTIntersection.PEACHTREE_NORTH.getValue()) || (ptiOrigin.getValue() == PTIntersection.PEACHTREE_SOUTH.getValue()))
+					interArrivalOutput.writeln(simOriginMappings.get(origin)+", "+iaTime);
 				
 				//System.out.println(" currentTime: "+currentTime);
 				if( currentTime > SIM_TIME_SECONDS ){
@@ -331,7 +391,7 @@ public class Peachtree {
 				
 			}
 		}
-		
+		interArrivalOutput.close();
 		return arrivals;
 		
 	}
