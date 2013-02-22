@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
@@ -40,7 +41,7 @@ public class TrafficStatistics {
 	 * - throughput
 	 * - origin-destination distribution
 	*/
-	private HashMap<OrigDestData,LinkedList<VehicleStatsInfo>> vehicleStats;
+	private HashMap<OrigDestData,ArrayList<VehicleStatsInfo>> vehicleStats;
 	private HashMap<PTIntersection,LinkedList<Double>> intersectionTimestamps;
 	protected final static int MAX = 0;
 	protected final static int AVG = 1;
@@ -56,7 +57,7 @@ public class TrafficStatistics {
 	public TrafficStatistics(){	
 		
 		
-		vehicleStats = new HashMap<OrigDestData,LinkedList<VehicleStatsInfo>>();
+		vehicleStats = new HashMap<OrigDestData,ArrayList<VehicleStatsInfo>>();
 		intersectionTimestamps = new HashMap<PTIntersection,LinkedList<Double>>();
 		
 		id = run++;
@@ -94,13 +95,13 @@ public class TrafficStatistics {
 		OrigDestData origDest = new OrigDestData( vehicle.getOrigin(), vehicle.getDestination() );
 		
 		double totalTime = time - vehicle.getSystemArrivalTime();
-		VehicleStatsInfo vinfo = new VehicleStatsInfo( totalTime, vehicle.getDelays() );
+		VehicleStatsInfo vinfo = new VehicleStatsInfo( totalTime, vehicle.getDelays(),vehicle.getSystemArrivalTime() );
 		
 		if( vehicleStats.containsKey( origDest ) ){
 			vehicleStats.get( origDest ).add( vinfo ); 
 		}
 		else{
-			LinkedList<VehicleStatsInfo> list = new LinkedList<VehicleStatsInfo>();
+			ArrayList<VehicleStatsInfo> list = new ArrayList<VehicleStatsInfo>();
 			list.add( vinfo );
 			vehicleStats.put( origDest, list );
 		}
@@ -169,6 +170,63 @@ public class TrafficStatistics {
 		
 		return vehicleTimeInSystem;
 	}
+	public double[] getFullStats(int start,int end){
+		
+		double [] vehicleTimeInSystem = new double[2];
+		
+		//avg time in system
+		//max time in system
+		double max = -1;
+		double avg = 0;
+		int count = 0;
+		
+		OrigDestData[] origDest = new OrigDestData[2];
+		origDest[0] = new OrigDestData(PTIntersection.PEACHTREE_NORTH,PTIntersection.PEACHTREE_SOUTH);
+		origDest[1] = new OrigDestData(PTIntersection.PEACHTREE_SOUTH,PTIntersection.PEACHTREE_NORTH);
+		
+		for( int i=0;i<2;i++){
+			
+			ArrayList<VehicleStatsInfo> coll = vehicleStats.get( origDest[i] );
+			Comparator<VehicleStatsInfo> cmp = new Comparator<VehicleStatsInfo>(){
+
+				public int compare(VehicleStatsInfo arg0, VehicleStatsInfo arg1) {
+					if( arg0.getArrival() - arg1.getArrival() < 0 )
+						return -1;
+					else if( arg0.getArrival() - arg1.getArrival() > 0 )
+						return 1;
+					else
+						return 0;
+				}
+				
+			};
+			
+			Collections.sort(coll,cmp);
+			VehicleStatsInfo key = new VehicleStatsInfo(-1,null,start);
+			int index = Collections.binarySearch(coll, key,cmp);
+			if( index < 0 )
+				index = -1*(index+1);
+				//-(insertion point) - 1)
+			
+			while( index < coll.size() && coll.get(index).getArrival()<=end ){
+				
+				VehicleStatsInfo vinfo = coll.get(index);
+				if( vinfo.getArrival()>= start && vinfo.getArrival()<=end){
+					
+					double time = vinfo.getTimeInSystem();
+					
+					avg += time;
+					if( time > max )
+						max = time;
+					count++;
+				}
+				index++;
+			}
+		}
+		vehicleTimeInSystem[MAX] = max;
+		vehicleTimeInSystem[AVG] = (double)avg/count;
+		
+		return vehicleTimeInSystem;
+	}
 	public double[] getTimeInSystemMaxAvg( OrigDestData origDest ){
 		
 		double [] vehicleTimeInSystem = new double[2];
@@ -217,7 +275,7 @@ public class TrafficStatistics {
 		
 		for( OrigDestData origDest: data ){
 			
-			LinkedList<VehicleStatsInfo> list = vehicleStats.get(origDest);
+			ArrayList<VehicleStatsInfo> list = vehicleStats.get(origDest);
 			for( VehicleStatsInfo vinfo:list ){
 				int orig = origDest.origin.getValue();
 				int dest = origDest.dest.getValue();

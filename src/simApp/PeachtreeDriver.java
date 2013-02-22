@@ -10,7 +10,7 @@ import simEngine.EventEngine;
 
 public class PeachtreeDriver {
 
-	private final static int NUM_RUNS = 2;
+	protected final static int NUM_RUNS = 5;
 	private final static int MEAN = 0;
 	private final static int HALF_WIDTH = 1;
 	private static EventEngine engine;
@@ -62,7 +62,10 @@ public class PeachtreeDriver {
 		var/=(N-1);
 		stdev = Math.sqrt( var );
 		
-		t = tValues[N-1];
+		if( N>=tValues.length)
+			t = tValues[tValues.length-1];
+		else
+			t = tValues[N-1];
 		
 		half = t*stdev/Math.sqrt(N);
 	
@@ -70,37 +73,74 @@ public class PeachtreeDriver {
 		res[HALF_WIDTH] = half;
 		return res;
 	}
-	public static void main(String[] args) {
+	public static void multipleReplications(){
 		
-		Peachtree.setWriteToFile();
-		TrafficStatistics []  simRuns = new TrafficStatistics[NUM_RUNS];
+			
+			Peachtree.setWriteToFile();
+			TrafficStatistics []  simRuns = new TrafficStatistics[NUM_RUNS];
+
+			double[] maxTemp = new double[NUM_RUNS];
+			double[] avgTemp = new double[NUM_RUNS];
+			OrigDestData orig = new OrigDestData(PTIntersection.PEACHTREE_SOUTH,PTIntersection.PEACHTREE_NORTH);
+			
+			for(int i=0;i<NUM_RUNS;i++){
+				System.out.print("Run "+(i+1)+" ");
+				simRuns[i]=runSimulation();
+				maxTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.MAX];
+				avgTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.AVG];
+				//maxTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.MAX];
+				//avgTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.AVG];
+				//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.MAX]);
+				//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.AVG]);
+				simRuns[i].printOrigDestData();
+				simRuns[i].printIntersectionThroughput();
+			
+
+			}
+			
+		
+			//make confidence interval
+			double [] maxCI = getConfidenceInterval(maxTemp);
+			double [] avgCI = getConfidenceInterval(avgTemp);
+			DecimalFormat fmt = new DecimalFormat("#.000");
+			System.out.println("Max time in system sample max = "+fmt.format(maxCI[0])+" CI: "+fmt.format(maxCI[0] - maxCI[1])+" <= mu <=  "+fmt.format(maxCI[0]+maxCI[1]));
+			System.out.println("Avg time in system sample avg = "+fmt.format(avgCI[0])+" CI: "+fmt.format(avgCI[0] - avgCI[1])+" <= mu <=  "+fmt.format(avgCI[0]+avgCI[1]));
+			
+	}
+	public static void batchMeans(){
+
+		TrafficStatistics  simRun = new TrafficStatistics();
 
 		double[] maxTemp = new double[NUM_RUNS];
 		double[] avgTemp = new double[NUM_RUNS];
 		OrigDestData orig = new OrigDestData(PTIntersection.PEACHTREE_SOUTH,PTIntersection.PEACHTREE_NORTH);
+		simRun=runSimulation();		
 		
-		for(int i=0;i<NUM_RUNS;i++){
-			System.out.print("Run "+(i+1)+" ");
-			simRuns[i]=runSimulation();
-			maxTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.MAX];
-			avgTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.AVG];
+		for( int i=0;i<NUM_RUNS;i++){
+			int start = i*Peachtree.TWO_HOURS;
+			int end = start + Peachtree.TWO_HOURS;
+
+			maxTemp[i] = simRun.getFullStats(start,end)[TrafficStatistics.MAX];
+			avgTemp[i] = simRun.getFullStats(start,end)[TrafficStatistics.AVG];
 			//maxTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.MAX];
 			//avgTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.AVG];
 			//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.MAX]);
 			//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.AVG]);
-			simRuns[i].printOrigDestData();
-			simRuns[i].printIntersectionThroughput();
-		
-
+			simRun.printOrigDestData();
+			simRun.printIntersectionThroughput();
 		}
-		
-	
 		//make confidence interval
 		double [] maxCI = getConfidenceInterval(maxTemp);
 		double [] avgCI = getConfidenceInterval(avgTemp);
 		DecimalFormat fmt = new DecimalFormat("#.000");
 		System.out.println("Max time in system sample max = "+fmt.format(maxCI[0])+" CI: "+fmt.format(maxCI[0] - maxCI[1])+" <= mu <=  "+fmt.format(maxCI[0]+maxCI[1]));
 		System.out.println("Avg time in system sample avg = "+fmt.format(avgCI[0])+" CI: "+fmt.format(avgCI[0] - avgCI[1])+" <= mu <=  "+fmt.format(avgCI[0]+avgCI[1]));
+	
+	}
+	public static void main(String[] args) {
+		
+		Peachtree.setWriteToFile();
+		batchMeans();	
 		
 	}
 
