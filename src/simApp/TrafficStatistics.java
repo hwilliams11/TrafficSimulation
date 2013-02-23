@@ -53,6 +53,7 @@ public class TrafficStatistics {
 	private PeachtreeSimOutput isThrougputOutput;
 	private boolean writeToFile = true;
 	private Peachtree pt;
+	private Comparator<VehicleStatsInfo> cmp;
 	
 	public TrafficStatistics(){	
 		
@@ -71,6 +72,18 @@ public class TrafficStatistics {
 			timeInSystemOutput = new PeachtreeSimOutput();
 			isThrougputOutput = new PeachtreeSimOutput();
 		}
+		cmp = new Comparator<VehicleStatsInfo>(){
+
+			public int compare(VehicleStatsInfo arg0, VehicleStatsInfo arg1) {
+				if( arg0.getArrival() - arg1.getArrival() < 0 )
+					return -1;
+				else if( arg0.getArrival() - arg1.getArrival() > 0 )
+					return 1;
+				else
+					return 0;
+			}
+			
+		};
 	}
 	public void updateIntersectionThroughput( Intersection is, double time ){
 		
@@ -83,7 +96,8 @@ public class TrafficStatistics {
 		else{
 			LinkedList<Double> list = new LinkedList<Double>();
 			list.add( time );
-			intersectionTimestamps.put( isName, list);
+			PTIntersection id = isName;
+			intersectionTimestamps.put( id, list);
 		}
 	}
 	public void updateVehicleStats(Vehicle vehicle, Intersection is,
@@ -187,18 +201,7 @@ public class TrafficStatistics {
 		for( int i=0;i<2;i++){
 			
 			ArrayList<VehicleStatsInfo> coll = vehicleStats.get( origDest[i] );
-			Comparator<VehicleStatsInfo> cmp = new Comparator<VehicleStatsInfo>(){
-
-				public int compare(VehicleStatsInfo arg0, VehicleStatsInfo arg1) {
-					if( arg0.getArrival() - arg1.getArrival() < 0 )
-						return -1;
-					else if( arg0.getArrival() - arg1.getArrival() > 0 )
-						return 1;
-					else
-						return 0;
-				}
-				
-			};
+			
 			
 			Collections.sort(coll,cmp);
 			VehicleStatsInfo key = new VehicleStatsInfo(-1,null,start);
@@ -286,5 +289,4 @@ public class TrafficStatistics {
 			}
 		}
 	}
-	
 }

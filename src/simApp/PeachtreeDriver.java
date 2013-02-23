@@ -10,7 +10,9 @@ import simEngine.EventEngine;
 
 public class PeachtreeDriver {
 
-	protected final static int NUM_RUNS = 5;
+	protected static int NUM_BATCHES = 5;
+	protected static int NUM_RUNS = 5;
+	
 	private final static int MEAN = 0;
 	private final static int HALF_WIDTH = 1;
 	private static EventEngine engine;
@@ -75,7 +77,9 @@ public class PeachtreeDriver {
 	}
 	public static void multipleReplications(){
 		
-			
+
+			NUM_BATCHES = 1;
+			NUM_RUNS = 5;
 			Peachtree.setWriteToFile();
 			TrafficStatistics []  simRuns = new TrafficStatistics[NUM_RUNS];
 
@@ -126,8 +130,6 @@ public class PeachtreeDriver {
 			//avgTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.AVG];
 			//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.MAX]);
 			//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.AVG]);
-			simRun.printOrigDestData();
-			simRun.printIntersectionThroughput();
 		}
 		//make confidence interval
 		double [] maxCI = getConfidenceInterval(maxTemp);
@@ -141,6 +143,7 @@ public class PeachtreeDriver {
 		
 		Peachtree.setWriteToFile();
 		batchMeans();	
+		multipleReplications();
 		
 	}
 

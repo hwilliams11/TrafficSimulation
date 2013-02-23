@@ -8,11 +8,13 @@ package simApp;
 public class IntersectionDeparture extends TrafficEvent{
 
 	private Intersection is;
+	private TrafficStatistics stats; 
 	
 	public IntersectionDeparture(Intersection is, Vehicle v,double time){
 		
 		super(v,time,EventType.IS_DEPARTURE);
 		this.is = is;
+		stats = peachtree.getStats();
 	}
 	/**
 	 * Go to the next intersection or depart the system
@@ -26,11 +28,10 @@ public class IntersectionDeparture extends TrafficEvent{
 			
 			return new SystemDeparture( is,vehicle,vehicle.getDirection(), time+travelTime);
 		}
-		
+		stats.updateIntersectionThroughput(is, time);
 		VehicleISInfo vinfo = peachtree.nextIntersection(vehicle);
 		Intersection nextIs = vinfo.getIntersection();
 		VehicleDirection direction = vinfo.getDirection();
-		
 		
 		vehicle.setDirection(direction);
 		IntersectionQArrival iqa = new IntersectionQArrival( nextIs,direction,vehicle,time+travelTime);

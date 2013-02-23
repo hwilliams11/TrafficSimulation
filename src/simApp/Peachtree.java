@@ -47,10 +47,10 @@ public class Peachtree {
 	private HashMap<Integer, OriginInfo> originDestinationMap;
 	private HashMap<PTIntersection,Intersection> intersections;
 	private HashMap<Integer, Double> originRates;
-	private final static  int NUM_BATCHES = PeachtreeDriver.NUM_RUNS;
+	private static  int NUM_BATCHES;
 	public static final int TWO_HOURS = 7200;
-	private final static int SIM_TIME_SECONDS = NUM_BATCHES*TWO_HOURS;
-	private final int END_TIME = NUM_BATCHES*10000;
+	private static int SIM_TIME_SECONDS;
+	private static int END_TIME;
 	private final  String trafficLightTimesFile = "lightTimes.txt";
 	private final  String originDestinationDataFile = "originDestinationDistributionData.csv";
 	private boolean useGamma = true;
@@ -83,6 +83,10 @@ public class Peachtree {
 		simOriginMappings.put(52, 113);
 		simOriginMappings.put( 1, 101);
 		simOriginMappings.put(61, 114);
+		
+		NUM_BATCHES = PeachtreeDriver.NUM_BATCHES;
+		SIM_TIME_SECONDS = NUM_BATCHES*TWO_HOURS;
+		END_TIME = NUM_BATCHES*10000;
 		
 	}
 	private void setup(){
@@ -267,7 +271,6 @@ public class Peachtree {
 	public List<TrafficEvent> createArrivals(){
 		
 		//return test();
-		
 		if( useGamma )
 			return createArrivalsGamma();
 		else

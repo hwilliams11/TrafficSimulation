@@ -35,8 +35,8 @@ public TrafficLight(int endTime,HashMap<VehicleDirection,TrafficLightTimings> di
  */
 public double getDelay(double time, VehicleDirection vehicleDirection) {
 	
-		int maxPedestrianDelay = 5;
-		int perceptiontime = 4;
+		double maxPedestrianDelay = 5;
+		double perceptiontime = 4;
 		Peachtree pt = Peachtree.getInstance();
 		
 		if( vehicleDirection.rightTurn() ){
@@ -47,7 +47,7 @@ public double getDelay(double time, VehicleDirection vehicleDirection) {
 					System.out.println("Pedestrians Crossing !!!!! Right turn delayed!");
 				}
 				RandomGenerator r = new RandomGenerator();
-				return (int)(maxPedestrianDelay*r.xorrandDouble());
+				return maxPedestrianDelay*r.xorrandDouble();
 			}
 			return 0;
 		}
@@ -72,7 +72,7 @@ public double getDelay(double time, VehicleDirection vehicleDirection) {
 						System.out.println("Pedestrians Crossing !!!!!");
 					}
 					RandomGenerator r = new RandomGenerator();
-					return (int)(maxPedestrianDelay*r.xorrandDouble());
+					return maxPedestrianDelay*r.xorrandDouble();
 				}
 			
 				/**
@@ -102,14 +102,14 @@ public double getDelay(double time, VehicleDirection vehicleDirection) {
 					else{
 						delay = 0;
 					}
-					int crossingdelay = (int)delay;
+					double crossingdelay = delay;
 					
-					int pdelay = 0;
+					double pdelay = 0;
 					if(Pedestrians()){
 						if( ! pt.getWritetoFile() ){
 							System.out.println("Pedestrians Crossing !!!!!");
 						}
-						pdelay = (int)(maxPedestrianDelay*r.xorrandDouble());
+						pdelay = maxPedestrianDelay*r.xorrandDouble();
 					}
 					
 					// Add function to propagate delay here
