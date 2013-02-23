@@ -13,9 +13,7 @@ public class Intersection {
 	
 	private static Double DEFAULT_PROCTIME = 5.0;
 	private HashMap<VehicleDirection, QueueInfo> intersectionQs;
-	//private HashMap<VehicleDirection,Integer> lightTimes;
 	private TrafficLight light;
-	private double averageDelay;
 	private PTIntersection id;
 	private Peachtree peachtree;
 	private double PedestrianProb;
@@ -38,8 +36,11 @@ public class Intersection {
 		peachtree = Peachtree.getInstance();
 		
 		intersectionQs = new HashMap<VehicleDirection,QueueInfo>();
-		int queuelen = 3;
+		int queuelen = 10;
 		
+		/*
+		 * Setup the intersection queues for this intersection
+		 */
 		intersectionQs.put(VehicleDirection.NN, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		intersectionQs.put(VehicleDirection.NE, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		intersectionQs.put(VehicleDirection.NS, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
@@ -61,10 +62,11 @@ public class Intersection {
 		intersectionQs.put(VehicleDirection.WS, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		intersectionQs.put(VehicleDirection.WW, new QueueInfo(new MyQueue<Vehicle>(),queuelen));
 		
-		averageDelay=0;
-		
 		light = new TrafficLight(peachtree.getEndTime(),lightTimes,id);
 	
+		/*
+		 * Setup pedestrian probability
+		 */
 		if(id == PTIntersection.TENTH)
 			this.PedestrianProb = 0.7;
 		else if(id == PTIntersection.ELEVENTH)
@@ -94,13 +96,6 @@ public class Intersection {
 	public HashMap<VehicleDirection, QueueInfo> getIntersectionQs() {
 		return intersectionQs;
 	}
-/**
- * 
- * @return returns the average delay at an intersection
- */
-	public double getAverageDelay() {
-		return averageDelay;
-	}
 
 /**
  * Gets the time that a car will have to wait before light turns green
@@ -113,23 +108,50 @@ public double getDelay(double time, VehicleDirection direction) {
 		//System.out.println(light);
 		return light.getDelay(time, direction);
 }
+/**
+ * 
+ * @param vehicle
+ * @return time it takes the vehicle to cross the intersection
+ */
 public double getProcessingTime(Vehicle vehicle) {
 	return processingTime+1;
 }
+/**
+ * 
+ * @return TrafficLight object for this intersection
+ */
 public TrafficLight getLight() {
 	return light;
 }
+/*
+ * 
+ * @return Peachtree object
+ */
 public Peachtree getPeachtree() {
 	return peachtree;
 }
+/**
+ * 
+ * @return pedestrian probability at this intersection
+ */
 public double getPedestrianProb(){
 	
 	return this.PedestrianProb; 
 }
+/**
+ * 
+ * @param direction to find the right queue
+ * @return length of queue for direction
+ */
 public int getQueueSize(VehicleDirection direction){
 	
 	return intersectionQs.get(direction).getQueue().size();
 }
+/**
+ * 
+ * @param direction to find the right queue
+ * @return returns the queue
+ */
 public MyQueue<Vehicle> getQueue(VehicleDirection direction){
 	
 	return intersectionQs.get(direction).getQueue();
@@ -157,8 +179,7 @@ public MyQueue<Vehicle> getQueue(VehicleDirection direction){
 		return v;
 	}
 public String toString() {
-	return "Intersection [averageDelay="
-			+ averageDelay + ", id=" + id + "]";
+	return "Intersection [ id=" + id + "]";
 }
 
 

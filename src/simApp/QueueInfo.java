@@ -1,10 +1,20 @@
 package simApp;
 
+/**
+ * Holds queue and its max length
+ * @author Holly
+ *
+ */
 public class QueueInfo {
 
 	MyQueue<Vehicle> queue;
 	int MAX_LEN;
 	
+	/**
+	 * 
+	 * @param queue 
+	 * @param maxlen maxlen of the queue
+	 */
 	public QueueInfo( MyQueue<Vehicle> queue, int maxlen ){
 		this.queue = queue;
 		this.MAX_LEN = maxlen;

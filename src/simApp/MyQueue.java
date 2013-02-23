@@ -3,6 +3,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.*;
 
+/**
+ * LinkedList Queue implementation
+ * @author Holly
+ *
+ * @param <AnyType>
+ */
 public class MyQueue<AnyType> implements Queue<AnyType>{
 
 	private LinkedList<AnyType> queue;

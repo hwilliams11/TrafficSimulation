@@ -156,6 +156,9 @@ public class PriorityQueue<AnyType> {
 		}
 		return list;
 	}
+	/**
+	 * Remove itemse from priority queue
+	 */
 	public void clear(){
 		pq.clear();
 		pq.add( null );

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="TrafficSimulation">
+    <property environment="env"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+    <path id="TrafficSimulation.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="commons-math3-3.1.1.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+		<mkdir dir="lib"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.ucls"/>
+                <exclude name="**/*.useq"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+		  <delete>
+			<fileset dir="." includes="*.txt"/>
+		</delete>
+		<delete file="${ant.project.name}.jar"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="TrafficSimulation.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+	<target name="jar" depends="build">
+	        <jar destfile="${ant.project.name}.jar" basedir="bin">
+	            <manifest>
+	              <attribute name="Main-Class" value="simApp.PeachtreeDriver"/>
+	              <attribute name="Class-Path" value="commons-math3-3.1.1.jar"/>
+	            </manifest>
+	        </jar>
+	</target>
+
+    <target name="Driver">
+        <java classname="Driver" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="EventEngine">
+        <java classname="simEngine.EventEngine" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="Exponential">
+        <java classname="generalAlgos.Exponential" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="Foo">
+        <java classname="simApp.Foo" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="Peachtree">
+        <java classname="simApp.Peachtree" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="PeachtreeDriver">
+        <java classname="simApp.PeachtreeDriver" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="Person1">
+        <java classname="simApp.Person1" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="PQ">
+        <java classname="generalAlgos.PQ" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="TestDirection">
+        <java classname="testSim.TestDirection" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="TestExponential">
+        <java classname="testSim.TestExponential" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="TestFullQueue">
+        <java classname="testSim.TestFullQueue" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="TestGamma">
+        <java classname="testSim.TestGamma" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="TestPriorityQueue">
+        <java classname="testSim.TestPriorityQueue" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+    <target name="TestTrafficLight">
+        <java classname="testSim.TestTrafficLight" failonerror="true" fork="yes">
+            <classpath refid="TrafficSimulation.classpath"/>
+        </java>
+    </target>
+</project>

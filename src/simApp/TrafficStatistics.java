@@ -10,6 +10,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
+/**
+ * Class records the statistics for runs of the program
+ * @author Holly
+ *
+ */
 public class TrafficStatistics {
 	
 	/*

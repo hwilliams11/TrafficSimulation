@@ -1,11 +1,20 @@
 package simApp;
 
-
+/**
+ * OrigDestData class holds origin destinatin info
+ * @author Holly
+ *
+ */
 class OrigDestData{
 	
 	public PTIntersection origin;
 	public PTIntersection dest;
 	
+	/**
+	 * 
+	 * @param origin Origin of vehicle
+	 * @param dest Destination of vehicle
+	 */
 	public OrigDestData( PTIntersection origin, PTIntersection dest ){
 		
 		this.origin = origin;

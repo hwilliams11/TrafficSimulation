@@ -1,5 +1,10 @@
 package simApp;
 
+/**
+ * Stopping condition for TrafficSimulation
+ * @author Holly
+ *
+ */
 public class TrafficSimulationDone extends SimulationDone {
 
 	Peachtree pt;

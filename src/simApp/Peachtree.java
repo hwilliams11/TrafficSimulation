@@ -39,10 +39,6 @@ public class Peachtree {
 	protected  final double RATE = 1/8.0;
 	private final double AGGRESSIVENESS_PROB = .08;
 	private int totalCars;
-	private double averageCarsInSystem;
-	private double averageDelay;
-	private int sumTimeInSystem;
-	private double averageTimeInSystem;
 	private int [][] originDestinationData;
 	private HashMap<Integer, OriginInfo> originDestinationMap;
 	private HashMap<PTIntersection,Intersection> intersections;
@@ -51,13 +47,13 @@ public class Peachtree {
 	public static final int TWO_HOURS = 7200;
 	private static int SIM_TIME_SECONDS;
 	private static int END_TIME;
-	private final  String trafficLightTimesFile = "lightTimes.txt";
+	private final  String trafficLightTimesFile = "lightTimes.csv";
 	private final  String originDestinationDataFile = "originDestinationDistributionData.csv";
 	private boolean useGamma = true;
 	private final String gammaDataFile = "gammaTrafficSim.csv"; 
 	private final int MULT_15MIN = 8;
 	private HashMap<PTIntersection,Double[]> gammaData;
-	private String processingFilename = "serverProcessingTime.txt";
+	private String processingFilename = "serverProcessingTime.csv";
 	private static HashMap<Integer,Integer> simOriginMappings;
 	
 	private Peachtree(){
@@ -89,6 +85,9 @@ public class Peachtree {
 		END_TIME = NUM_BATCHES*10000;
 		
 	}
+	/**
+	 * Read the arrival event probability distribution data and save
+	 */
 	private void setup(){
 		
 		if( useGamma )
@@ -96,6 +95,9 @@ public class Peachtree {
 		else
 			setupExpon();
 	}
+	/**
+	 * Read data files and create data for using the exponential distribution
+	 */
 	private void setupExpon(){
 		
 		HashMap<PTIntersection,HashMap<VehicleDirection,TrafficLightTimings>> lightTimes = readLightTimes();
@@ -268,6 +270,10 @@ public class Peachtree {
 		scan.close();
 		return hm;
 	}
+	/**
+	 * Creates vehicles and a list of SystemArrivals
+	 * @return returns a list of SystemArrival objects
+	 */
 	public List<TrafficEvent> createArrivals(){
 		
 		//return test();
@@ -277,35 +283,11 @@ public class Peachtree {
 			return createArrivalsExpon();
 		
 	}
-	public List<TrafficEvent> test(){
-		
-		getOriginData();
-		LinkedList<TrafficEvent> arrivals = new LinkedList<TrafficEvent>();
-		double currentTime;
-		
-		currentTime = 0;
-		
-		
-		PTIntersection ptiOrigin = PTIntersection.PEACHTREE_NORTH;
-		double shape = gammaData.get( ptiOrigin )[0];
-		double scale = gammaData.get( ptiOrigin )[1];
-		
-		GammaDistribution gamma = new GammaDistribution(shape,scale);
-		//System.out.println("ORIGIN: "+origin+" rate: "+rate);
-		currentTime += gamma.sample();
-
-		PTIntersection ptiDest = PTIntersection.PEACHTREE_SOUTH;
-		Vehicle v = new Vehicle(totalCars++,(int)currentTime,ptiOrigin,ptiDest);
-		arrivals.add( new SystemArrival( v,currentTime) );
-	
-		return arrivals;
-		
-	}
 	/**
-	 * Creates vehicles and a list of SystemArrivals
+	 * Creates vehicles and a list of SystemArrivals using exponential distribution
 	 * @return returns a list of SystemArrival objects
 	 */
-	public  List<TrafficEvent> createArrivalsExpon(){
+	private  List<TrafficEvent> createArrivalsExpon(){
 		
 		getOriginData();
 		LinkedList<TrafficEvent> arrivals = new LinkedList<TrafficEvent>();
@@ -343,12 +325,16 @@ public class Peachtree {
 		
 		return arrivals;
 	}
-	public List<TrafficEvent> createArrivalsGamma(){
+	/**
+	 * Creates vehicles and a list of SystemArrivals using Gamma distribution
+	 * @return returns a list of SystemArrival objects
+	 */
+	private List<TrafficEvent> createArrivalsGamma(){
 		
 		getOriginData();
 		LinkedList<TrafficEvent> arrivals = new LinkedList<TrafficEvent>();
 		double currentTime;
-		String interArrivaltimes = "interArrivalTimes.txt";
+		String interArrivaltimes = "simInterArrivalTimes.txt";
 		PeachtreeSimOutput 	interArrivalOutput;
 		
 		if( writeToFile ){
@@ -379,7 +365,7 @@ public class Peachtree {
 				if( (ptiOrigin.getValue() == PTIntersection.PEACHTREE_NORTH.getValue()) || (ptiOrigin.getValue() == PTIntersection.PEACHTREE_SOUTH.getValue()))
 					interArrivalOutput.writeln(simOriginMappings.get(origin)+", "+iaTime);
 				
-				//System.out.println(" currentTime: "+currentTime);
+				
 				if( currentTime > SIM_TIME_SECONDS ){
 					break;
 				}
@@ -434,19 +420,6 @@ public class Peachtree {
 		else{			//fourteenth street intersection
 			return intersections.get( PTIntersection.FOURTEENTH );
 		}
-	}
-	/**
-	 * Updates the statistics of the system an intersection after a departure
-	 * @param is Intersection to update
-	 * @param direction direction that car left
-	 * @param time time that car departed
-	 * @param vehicle Vehicle object that left system
-	 */
-	public  void updateStatistics(Intersection is,
-			VehicleDirection direction, double time, Vehicle vehicle) {
-		
-		stats.updateVehicleStats(vehicle, is, direction, time);
-		
 	}
 	/**
 	 * Based on the destination of a car and its current location finds the next Peachtree intersection
@@ -526,12 +499,6 @@ public class Peachtree {
 		System.exit(0);
 		return null;
 	}
-	public  int getTotalCars(){
-		return totalCars;
-	}
-	public  int getEndTime() {
-		return END_TIME;
-	}
 	public  void computeRoute(Vehicle vehicle) {
 		
 		Intersection is = instance.findIntersection( vehicle.getOrigin() );
@@ -610,13 +577,27 @@ public class Peachtree {
 		*/
 		//System.exit(0);
 	}
+	/**
+	 * Determines if a car's destination is east or sest of this destination
+	 * @param is Intersection
+	 * @param vehicle vehicle
+	 * @return true if destination is east or west of the current intersection
+	 */
 	private  boolean sameLevel( Intersection is, Vehicle vehicle) {
 		return is.getId().getValue()/10 == vehicle.getDestination().getValue()/10;
 	}
+	/**
+	 * Get the next intersection to prcoess
+	 * @param vehicle the route we want to remove
+	 * @return the first intersection
+	 */
 	public  VehicleISInfo nextIntersection(Vehicle vehicle) {
 		
 		return vehicle.getRoute().remove();
 	}
+	/**
+	 * Read origin distribution into memory. Read rates into memory
+	 */
 	public  void getOriginData(){
 		
 		Scanner scan = null;
@@ -664,6 +645,9 @@ public class Peachtree {
 		
 		//System.out.println(originRates);
 	}
+	/**
+	 * Prints the distribution of traveling from the origin to each destination to screen
+	 */
 	public void printOriginDestinationData(){
 		Set<Integer> keySet  = originDestinationMap.keySet();
 		ArrayList<Integer> keys = new ArrayList<Integer>();
@@ -681,6 +665,11 @@ public class Peachtree {
 			System.out.println();
 		}
 	}
+	/**
+	 * Based on origin and the distribution used, generate a random destination
+	 * @param origin origin that car starts at
+	 * @return a random destinatino
+	 */
 	public  int generateRandomDestination( int origin ){
 		
 		Random rand = new Random();
@@ -706,6 +695,10 @@ public class Peachtree {
 		}
 		return -1;
 	}
+	/**
+	 * Prints results of generating random destinations. Results should be close
+	 * the input distriution
+	 */
 	public  void runDistributionTest(){
 		
 		ArrayList<Integer> keys = new ArrayList<Integer>();
@@ -740,24 +733,74 @@ public class Peachtree {
 			System.out.println();
 		}
 	}
-	public PeachtreeSimOutput getSimOutput() {
-		
-		return simOutput;
-	}
+	/**
+	 * 
+	 * @return mapping
+	 */
 	public HashMap<Integer, Integer> getOriginMappings(){
 		return simOriginMappings;
 	}
+	/**
+	 * 
+	 * @return number of seconds in simulation
+	 */
 	public static int getSIM_TIME_SECONDS() {
 		return SIM_TIME_SECONDS;
 	}
+	/**
+	 * set write to file = true;
+	 */
 	public static void setWriteToFile() {
 		writeToFile = true;		
 	}
+	/**
+	 * Updates the statistics of the system an intersection after a departure
+	 * @param is Intersection to update
+	 * @param direction direction that car left
+	 * @param time time that car departed
+	 * @param vehicle Vehicle object that left system
+	 */
+	public  void updateStatistics(Intersection is,
+			VehicleDirection direction, double time, Vehicle vehicle) {
+		
+		stats.updateVehicleStats(vehicle, is, direction, time);
+		
+	}
+	/**
+	 * 
+	 * @return total cars
+	 */
+	public  int getTotalCars(){
+		return totalCars;
+	}
+	/**
+	 * 
+	 * @return end time of simulaton
+	 */
+	public  int getEndTime() {
+		return END_TIME;
+	}
+	/**
+	 * 
+	 * @return stas objects going
+	 */
 	public TrafficStatistics getStats() {
 		return stats;
 	}
+	/**
+	 *
+	 * @return writeToFile
+	 */ 
 	public boolean getWritetoFile() {
 		return writeToFile;
+	}
+	/**
+	 * 
+	 * @return output
+	 */
+	public PeachtreeSimOutput getSimOutput() {
+		
+		return simOutput;
 	}
 	public static void main(String[]args){
 		

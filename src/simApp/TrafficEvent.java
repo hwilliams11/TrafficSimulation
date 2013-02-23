@@ -31,13 +31,24 @@ public abstract class TrafficEvent extends Event{
 		
 		
 	}
+	/**
+	 * To be implemented by child classes
+	 */
 	public abstract TrafficEvent event();
 	public EventType getType() {
 		return type;
 	}
+	/**
+	 * 
+	 * @return vehicle
+	 */
 	public Vehicle getVehicle() {
 		return vehicle;
 	}
+	/**
+	 * 
+	 * @return time
+	 */
 	public double getTime() {
 		return time;
 	}

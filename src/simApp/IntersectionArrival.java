@@ -14,10 +14,16 @@ public class IntersectionArrival extends TrafficEvent {
 	private Intersection is;
 	private VehicleDirection direction;
 
-	
-public IntersectionArrival(Intersection is, Vehicle v,VehicleDirection direction, double d){
+/**
+ * 	
+ * @param is Intersection of the arrival
+ * @param v vehicle arriving
+ * @param direction direction that vehicle is traveling
+ * @param time time of event
+ */
+public IntersectionArrival(Intersection is, Vehicle v,VehicleDirection direction, double time){
 		
-		super(v,d,EventType.IS_ARRIVAL);
+		super(v,time,EventType.IS_ARRIVAL);
 		this.is = is;
 		this.direction = direction;
 	}

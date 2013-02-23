@@ -8,6 +8,11 @@ import java.util.List;
 
 import simEngine.EventEngine;
 
+/**
+ * Driver of simulation
+ * @author Holly
+ *
+ */
 public class PeachtreeDriver {
 
 	protected static int NUM_BATCHES = 5;
@@ -17,11 +22,20 @@ public class PeachtreeDriver {
 	private final static int HALF_WIDTH = 1;
 	private static EventEngine engine;
 	
+	/**
+	 * 
+	 * @return future event list
+	 */
 	public static PriorityQueue<Event> getFutureEventList(){
 		
 		return engine.getFutureEventList();
 		
+		
 	}
+	/**
+	 * Runs a simulation 
+	 * @return statistics of this run
+	 */
 	public static TrafficStatistics runSimulation(){
 		
 		Comparator<Event> cmp = new EventComparator();
@@ -36,6 +50,11 @@ public class PeachtreeDriver {
 		return stats;
 		
 	}
+	/**
+	 * Gets the confidence interval of an array of data
+	 * @param values values to compute confidence interval for
+	 * @return average and standard deviation in a len-2 array
+	 */
 	public static double[] getConfidenceInterval( double [] values ){
 		
 		double mean = 0;
@@ -75,6 +94,9 @@ public class PeachtreeDriver {
 		res[HALF_WIDTH] = half;
 		return res;
 	}
+	/**
+	 * Run multiple replications for simulation
+	 */
 	public static void multipleReplications(){
 		
 
@@ -94,8 +116,6 @@ public class PeachtreeDriver {
 				avgTemp[i] = simRuns[i].getFullStats()[TrafficStatistics.AVG];
 				//maxTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.MAX];
 				//avgTemp[i] = simRuns[i].getTimeInSystemMaxAvg(orig)[TrafficStatistics.AVG];
-				//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.MAX]);
-				//System.out.println(simRuns[i].getTimeInSystemInfo()[TrafficStatistics.AVG]);
 				simRuns[i].printOrigDestData();
 				simRuns[i].printIntersectionThroughput();
 			
@@ -107,20 +127,25 @@ public class PeachtreeDriver {
 			double [] maxCI = getConfidenceInterval(maxTemp);
 			double [] avgCI = getConfidenceInterval(avgTemp);
 			DecimalFormat fmt = new DecimalFormat("#.000");
-			System.out.println("Max time in system sample max = "+fmt.format(maxCI[0])+" CI: "+fmt.format(maxCI[0] - maxCI[1])+" <= mu <=  "+fmt.format(maxCI[0]+maxCI[1]));
+			//System.out.println("Max time in system sample max = "+fmt.format(maxCI[0])+" CI: "+fmt.format(maxCI[0] - maxCI[1])+" <= mu <=  "+fmt.format(maxCI[0]+maxCI[1]));
 			System.out.println("Avg time in system sample avg = "+fmt.format(avgCI[0])+" CI: "+fmt.format(avgCI[0] - avgCI[1])+" <= mu <=  "+fmt.format(avgCI[0]+avgCI[1]));
 			
 	}
+	/**
+	 * Run batch means
+	 */
 	public static void batchMeans(){
 
 		TrafficStatistics  simRun = new TrafficStatistics();
 
 		double[] maxTemp = new double[NUM_RUNS];
 		double[] avgTemp = new double[NUM_RUNS];
+		
+		System.out.println("Running simulation - batch means");
 		OrigDestData orig = new OrigDestData(PTIntersection.PEACHTREE_SOUTH,PTIntersection.PEACHTREE_NORTH);
 		simRun=runSimulation();		
 		
-		for( int i=0;i<NUM_RUNS;i++){
+		for( int i=0;i<NUM_BATCHES;i++){
 			int start = i*Peachtree.TWO_HOURS;
 			int end = start + Peachtree.TWO_HOURS;
 
@@ -135,7 +160,7 @@ public class PeachtreeDriver {
 		double [] maxCI = getConfidenceInterval(maxTemp);
 		double [] avgCI = getConfidenceInterval(avgTemp);
 		DecimalFormat fmt = new DecimalFormat("#.000");
-		System.out.println("Max time in system sample max = "+fmt.format(maxCI[0])+" CI: "+fmt.format(maxCI[0] - maxCI[1])+" <= mu <=  "+fmt.format(maxCI[0]+maxCI[1]));
+		//System.out.println("Max time in system sample max = "+fmt.format(maxCI[0])+" CI: "+fmt.format(maxCI[0] - maxCI[1])+" <= mu <=  "+fmt.format(maxCI[0]+maxCI[1]));
 		System.out.println("Avg time in system sample avg = "+fmt.format(avgCI[0])+" CI: "+fmt.format(avgCI[0] - avgCI[1])+" <= mu <=  "+fmt.format(avgCI[0]+avgCI[1]));
 	
 	}
